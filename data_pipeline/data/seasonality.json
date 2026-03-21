@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "generated_at": "2026-03-21T14:42:39.194243",
+    "version": "1.0",
+    "description": "Monthly income seasonality multipliers by gig type",
+    "source": "JPMorgan Chase Institute (income spikes in March and December)",
+    "note": "Multipliers are relative to annual average (1.0 = average month)"
+  },
+  "seasonality": {
+    "delivery": {
+      "jan": 1.05,
+      "feb": 0.95,
+      "mar": 1.15,
+      "apr": 0.98,
+      "may": 0.92,
+      "jun": 0.88,
+      "jul": 0.85,
+      "aug": 0.9,
+      "sep": 0.95,
+      "oct": 1.1,
+      "nov": 1.25,
+      "dec": 1.35
+    },
+    "rideshare": {
+      "jan": 0.95,
+      "feb": 0.95,
+      "mar": 1.1,
+      "apr": 1.05,
+      "may": 1.05,
+      "jun": 1.1,
+      "jul": 1.15,
+      "aug": 1.1,
+      "sep": 1.0,
+      "oct": 1.05,
+      "nov": 1.15,
+      "dec": 1.2
+    },
+    "general_gig": {
+      "jan": 1.0,
+      "feb": 0.97,
+      "mar": 1.1,
+      "apr": 1.02,
+      "may": 0.98,
+      "jun": 0.95,
+      "jul": 0.93,
+      "aug": 0.97,
+      "sep": 1.0,
+      "oct": 1.08,
+      "nov": 1.18,
+      "dec": 1.25
+    }
+  },
+  "tax_quarters": {
+    "due_months": [
+      "apr",
+      "jun",
+      "sep",
+      "jan"
+    ],
+    "effective_income_reduction": 0.25,
+    "description": "Self-employment tax estimated payment months (reduces take-home by ~25%)"
+  }
+}

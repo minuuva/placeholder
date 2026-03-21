@@ -1,0 +1,64 @@
+{
+  "2008_financial_crisis": {
+    "name": "2008 Financial Crisis",
+    "start_date": "2007-12-01",
+    "end_date": "2009-06-01",
+    "duration_months": 18,
+    "unemployment_peak": 10.0,
+    "unemployment_start": 5.0,
+    "gdp_decline_percent": -4.3,
+    "characteristics": {
+      "housing_crash": true,
+      "credit_freeze": true,
+      "consumer_spending_drop": "severe",
+      "gas_price_spike": true,
+      "gas_price_crash": true
+    },
+    "gig_economy_impact": {
+      "rideshare": 0.7,
+      "delivery": 0.85,
+      "freelance": 0.75
+    }
+  },
+  "2020_covid_recession": {
+    "name": "COVID-19 Recession",
+    "start_date": "2020-02-01",
+    "end_date": "2020-04-01",
+    "duration_months": 2,
+    "unemployment_peak": 14.7,
+    "unemployment_start": 3.5,
+    "gdp_decline_percent": -31.4,
+    "characteristics": {
+      "lockdowns": true,
+      "stimulus_payments": true,
+      "remote_work_surge": true,
+      "gas_price_crash": true,
+      "supply_chain_disruption": true
+    },
+    "gig_economy_impact": {
+      "rideshare": 0.4,
+      "delivery": 1.3,
+      "freelance": 1.1
+    }
+  },
+  "2022_inflation_slowdown": {
+    "name": "2022 Inflation Slowdown",
+    "start_date": "2022-06-01",
+    "end_date": "2023-12-01",
+    "duration_months": 18,
+    "unemployment_peak": 4.0,
+    "unemployment_start": 3.6,
+    "gdp_decline_percent": -1.6,
+    "characteristics": {
+      "high_inflation": true,
+      "interest_rate_hikes": true,
+      "gas_price_spike": true,
+      "tech_layoffs": true
+    },
+    "gig_economy_impact": {
+      "rideshare": 0.95,
+      "delivery": 1.05,
+      "freelance": 0.9
+    }
+  }
+}

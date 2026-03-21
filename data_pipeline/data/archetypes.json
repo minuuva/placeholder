@@ -1,0 +1,205 @@
+{
+  "metadata": {
+    "generated_at": "2026-03-21T14:42:39.193592",
+    "version": "1.0",
+    "description": "Gig worker archetype personas for VarLend risk modeling",
+    "source": "JPMorgan Chase Institute + Gridwise + industry research",
+    "count": 5
+  },
+  "archetypes": [
+    {
+      "id": "volatile_vic",
+      "name": "Volatile Vic",
+      "description": "Full-time DoorDash driver, single platform, high variance income",
+      "base_mu": 1642.31,
+      "base_sigma": 679.92,
+      "coefficient_of_variation": 0.414,
+      "platforms": [
+        "doordash"
+      ],
+      "hours_per_week": 45,
+      "metro": "national",
+      "experience_months": 6,
+      "skill_level": 0.95,
+      "skill_growth_rate": 0.02,
+      "diversification_probability": 0.15,
+      "platform_add_rate": 0.1,
+      "churn_risk": 0.2,
+      "event_modifiers": {
+        "vehicle_repair_probability": 1.2,
+        "health_issue_probability": 1.0,
+        "platform_deactivation_probability": 1.3,
+        "housing_instability_probability": 1.1,
+        "positive_event_probability": 0.8
+      },
+      "emergency_fund_weeks": 2,
+      "debt_to_income_ratio": 0.45,
+      "credit_score_range": [
+        580,
+        640
+      ],
+      "default_risk_category": "high",
+      "recommended_loan_amount_range": [
+        2000,
+        5000
+      ],
+      "recommended_loan_term_months": 12
+    },
+    {
+      "id": "steady_sarah",
+      "name": "Steady Sarah",
+      "description": "Multi-platform gig worker, diversified income, stable earnings",
+      "base_mu": 1450.08,
+      "base_sigma": 326.51,
+      "coefficient_of_variation": 0.225,
+      "platforms": [
+        "uber",
+        "doordash",
+        "instacart"
+      ],
+      "hours_per_week": 40,
+      "metro": "atlanta",
+      "experience_months": 24,
+      "skill_level": 1.1,
+      "skill_growth_rate": 0.05,
+      "diversification_probability": 0.3,
+      "platform_add_rate": 0.05,
+      "churn_risk": 0.1,
+      "event_modifiers": {
+        "vehicle_repair_probability": 1.0,
+        "health_issue_probability": 0.9,
+        "platform_deactivation_probability": 0.7,
+        "housing_instability_probability": 0.8,
+        "positive_event_probability": 1.3
+      },
+      "emergency_fund_weeks": 8,
+      "debt_to_income_ratio": 0.3,
+      "credit_score_range": [
+        660,
+        720
+      ],
+      "default_risk_category": "low",
+      "recommended_loan_amount_range": [
+        5000,
+        10000
+      ],
+      "recommended_loan_term_months": 24
+    },
+    {
+      "id": "weekend_warrior",
+      "name": "Weekend Warrior",
+      "description": "Part-time rideshare driver, supplemental income on weekends",
+      "base_mu": 580.99,
+      "base_sigma": 209.16,
+      "coefficient_of_variation": 0.36,
+      "platforms": [
+        "uber"
+      ],
+      "hours_per_week": 15,
+      "metro": "dallas",
+      "experience_months": 12,
+      "skill_level": 1.0,
+      "skill_growth_rate": 0.03,
+      "diversification_probability": 0.2,
+      "platform_add_rate": 0.08,
+      "churn_risk": 0.15,
+      "event_modifiers": {
+        "vehicle_repair_probability": 0.8,
+        "health_issue_probability": 0.9,
+        "platform_deactivation_probability": 1.0,
+        "housing_instability_probability": 0.7,
+        "positive_event_probability": 1.0
+      },
+      "emergency_fund_weeks": 10,
+      "debt_to_income_ratio": 0.25,
+      "credit_score_range": [
+        680,
+        740
+      ],
+      "default_risk_category": "low",
+      "recommended_loan_amount_range": [
+        1000,
+        3000
+      ],
+      "recommended_loan_term_months": 12
+    },
+    {
+      "id": "sf_hustler",
+      "name": "SF Hustler",
+      "description": "High-volume multi-platform driver in expensive San Francisco market",
+      "base_mu": 3948.41,
+      "base_sigma": 1080.48,
+      "coefficient_of_variation": 0.274,
+      "platforms": [
+        "uber",
+        "doordash"
+      ],
+      "hours_per_week": 50,
+      "metro": "san_francisco",
+      "experience_months": 36,
+      "skill_level": 1.15,
+      "skill_growth_rate": 0.04,
+      "diversification_probability": 0.25,
+      "platform_add_rate": 0.06,
+      "churn_risk": 0.12,
+      "event_modifiers": {
+        "vehicle_repair_probability": 1.3,
+        "health_issue_probability": 1.1,
+        "platform_deactivation_probability": 0.8,
+        "housing_instability_probability": 1.4,
+        "positive_event_probability": 1.2
+      },
+      "emergency_fund_weeks": 4,
+      "debt_to_income_ratio": 0.4,
+      "credit_score_range": [
+        640,
+        700
+      ],
+      "default_risk_category": "medium",
+      "recommended_loan_amount_range": [
+        5000,
+        12000
+      ],
+      "recommended_loan_term_months": 24
+    },
+    {
+      "id": "rising_ryan",
+      "name": "Rising Ryan",
+      "description": "New gig worker on growth trajectory, rapidly building skills and platforms",
+      "base_mu": 803.37,
+      "base_sigma": 230.07,
+      "coefficient_of_variation": 0.286,
+      "platforms": [
+        "doordash",
+        "instacart"
+      ],
+      "hours_per_week": 35,
+      "metro": "national",
+      "experience_months": 3,
+      "skill_level": 0.9,
+      "skill_growth_rate": 0.08,
+      "diversification_probability": 0.35,
+      "platform_add_rate": 0.15,
+      "churn_risk": 0.18,
+      "event_modifiers": {
+        "vehicle_repair_probability": 1.1,
+        "health_issue_probability": 0.95,
+        "platform_deactivation_probability": 1.2,
+        "housing_instability_probability": 1.0,
+        "positive_event_probability": 1.4
+      },
+      "emergency_fund_weeks": 3,
+      "debt_to_income_ratio": 0.35,
+      "credit_score_range": [
+        620,
+        680
+      ],
+      "default_risk_category": "medium",
+      "recommended_loan_amount_range": [
+        2000,
+        6000
+      ],
+      "recommended_loan_term_months": 18
+    }
+  ]
+}

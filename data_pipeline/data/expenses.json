@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "generated_at": "2026-03-21T14:42:39.195032",
+    "version": "1.0",
+    "description": "Gig worker expense structure and life event impacts",
+    "source": "Triplog + industry estimates"
+  },
+  "base_expenses": {
+    "gas_weekly_fulltime_range": [
+      150,
+      400
+    ],
+    "gas_weekly_parttime_range": [
+      50,
+      150
+    ],
+    "maintenance_monthly_range": [
+      50,
+      100
+    ],
+    "vehicle_depreciation_monthly": 200,
+    "insurance_monthly": 150,
+    "phone_data_monthly": 50,
+    "self_employment_tax_rate": 0.153
+  },
+  "life_events": {
+    "probabilities": {
+      "vehicle": {
+        "minor_repair": 0.4,
+        "major_repair": 0.15,
+        "accident": 0.1,
+        "replacement_needed": 0.05
+      },
+      "health": {
+        "minor_illness": 0.3,
+        "major_illness": 0.1,
+        "chronic_issue": 0.05
+      },
+      "platform": {
+        "deactivation": 0.2,
+        "fee_increase": 0.25,
+        "market_saturation": 0.15,
+        "policy_change": 0.2
+      },
+      "housing": {
+        "rent_increase": 0.3,
+        "forced_move": 0.05,
+        "emergency_repair": 0.1
+      },
+      "positive": {
+        "new_platform": 0.25,
+        "skill_upgrade": 0.15,
+        "referral_bonus": 0.2,
+        "side_gig": 0.1
+      }
+    },
+    "impacts": {
+      "vehicle_minor_repair": [
+        -300,
+        -150
+      ],
+      "vehicle_major_repair": [
+        -2000,
+        -500
+      ],
+      "vehicle_accident_downtime_weeks": [
+        2,
+        4
+      ],
+      "health_minor_illness_days": [
+        5,
+        7
+      ],
+      "health_major_illness_weeks": [
+        4,
+        12
+      ],
+      "platform_deactivation_weeks": [
+        2,
+        8
+      ],
+      "platform_fee_increase_percentage": [
+        0.02,
+        0.05
+      ],
+      "rent_increase_monthly": [
+        100,
+        300
+      ],
+      "new_platform_income_boost": [
+        0.15,
+        0.3
+      ],
+      "skill_upgrade_income_boost": [
+        0.05,
+        0.1
+      ]
+    }
+  },
+  "income_volatility": {
+    "median_cv": 0.36,
+    "typical_swing": 0.09,
+    "extreme_swing": 0.21,
+    "buffer_weeks": 6,
+    "spike_probability": 2.0,
+    "spike_months": [
+      3,
+      12
+    ]
+  },
+  "portfolio_evolution": {
+    "initial_platforms": 1.0,
+    "month_12_platforms": 2.3,
+    "diversification_rate": 0.1,
+    "platform_churn_rate": 0.05,
+    "hourly_earnings_growth": 0.1,
+    "efficiency_curve": "logarithmic",
+    "quit_probability_annual": 0.15
+  },
+  "default_parameters": {
+    "minimum_monthly_income": 1500,
+    "emergency_fund_weeks": 6,
+    "debt_to_income_threshold": 0.4,
+    "recovery_rate": 0.3
+  }
+}

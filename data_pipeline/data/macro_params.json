@@ -1,0 +1,196 @@
+{
+  "metadata": {
+    "generated_at": "2026-03-21T14:42:39.194568",
+    "version": "1.0",
+    "description": "Macro economic shock scenarios calibrated from historical data",
+    "source": "FRED historical data + recession analysis",
+    "categories": [
+      "recession",
+      "gas_spike",
+      "regulatory",
+      "tech_disruption",
+      "baseline_probabilities"
+    ]
+  },
+  "scenarios": {
+    "recession": {
+      "recession_2008": {
+        "name": "2008 Financial Crisis",
+        "trigger_probability": 0.05,
+        "duration_months": 18,
+        "unemployment_delta": 5.0,
+        "onset_speed": "slow",
+        "recovery_speed": "slow",
+        "platform_impacts": {
+          "rideshare": 0.7,
+          "delivery": 0.85,
+          "freelance": 0.75
+        },
+        "expense_changes": {
+          "gas_price_multiplier": 1.45,
+          "insurance_multiplier": 1.1,
+          "maintenance_multiplier": 1.05
+        },
+        "demand_patterns": {
+          "rideshare": 0.7,
+          "delivery": 0.85,
+          "general_gig": 0.75
+        }
+      },
+      "recession_2020": {
+        "name": "COVID-19 Recession",
+        "trigger_probability": 0.02,
+        "duration_months": 2,
+        "unemployment_delta": 11.2,
+        "onset_speed": "instant",
+        "recovery_speed": "fast",
+        "platform_impacts": {
+          "rideshare": 0.4,
+          "delivery": 1.3,
+          "freelance": 1.1
+        },
+        "expense_changes": {
+          "gas_price_multiplier": 0.7,
+          "insurance_multiplier": 0.95,
+          "maintenance_multiplier": 1.0
+        },
+        "demand_patterns": {
+          "rideshare": 0.4,
+          "delivery": 1.3,
+          "general_gig": 0.9
+        },
+        "special_factors": {
+          "stimulus_payments": true,
+          "unemployment_bonus": true,
+          "eviction_moratorium": true
+        }
+      },
+      "inflation_slowdown_2022": {
+        "name": "2022 Inflation Slowdown",
+        "trigger_probability": 0.15,
+        "duration_months": 18,
+        "unemployment_delta": 0.3999999999999999,
+        "onset_speed": "moderate",
+        "recovery_speed": "moderate",
+        "platform_impacts": {
+          "rideshare": 0.95,
+          "delivery": 1.05,
+          "freelance": 0.9
+        },
+        "expense_changes": {
+          "gas_price_multiplier": 1.3,
+          "insurance_multiplier": 1.12,
+          "maintenance_multiplier": 1.15
+        },
+        "demand_patterns": {
+          "rideshare": 0.95,
+          "delivery": 1.05,
+          "general_gig": 0.95
+        },
+        "special_factors": {
+          "high_interest_rates": true,
+          "real_wage_decline": true
+        }
+      }
+    },
+    "gas_spike": {
+      "gas_spike_moderate": {
+        "name": "Moderate Gas Price Spike",
+        "trigger_probability": 0.2,
+        "duration_months": 4,
+        "gas_price_multiplier": 1.25,
+        "platform_impacts": {
+          "rideshare": 0.92,
+          "delivery": 0.9,
+          "general_gig": 0.93
+        },
+        "expense_impact": 300
+      },
+      "gas_spike_severe": {
+        "name": "Severe Gas Price Spike",
+        "trigger_probability": 0.08,
+        "duration_months": 6,
+        "gas_price_multiplier": 1.5,
+        "platform_impacts": {
+          "rideshare": 0.85,
+          "delivery": 0.8,
+          "general_gig": 0.85
+        },
+        "expense_impact": 500,
+        "churn_increase": 0.1
+      }
+    },
+    "regulatory": {
+      "ab5_classification": {
+        "name": "AB5-Style Worker Reclassification",
+        "trigger_probability": 0.05,
+        "onset_speed": "slow",
+        "duration_months": "permanent",
+        "scenarios": {
+          "contractor_status_maintained": {
+            "probability": 0.7,
+            "platform_fee_increase": 0.05,
+            "income_impact": 0.95
+          },
+          "employee_classification": {
+            "probability": 0.3,
+            "income_impact": 0.9,
+            "benefits_gain": true,
+            "flexibility_loss": true
+          },
+          "platform_exit": {
+            "probability": 0.1,
+            "income_impact": 0.5,
+            "diversification_required": true
+          }
+        }
+      },
+      "minimum_wage_increase": {
+        "name": "Gig Worker Minimum Wage",
+        "trigger_probability": 0.1,
+        "platform_impacts": {
+          "rideshare": 1.05,
+          "delivery": 1.08,
+          "general_gig": 1.05
+        },
+        "volatility_reduction": 0.85,
+        "market_contraction": 0.95
+      }
+    },
+    "tech_disruption": {
+      "autonomous_vehicles_pilot": {
+        "name": "Autonomous Vehicle Pilot Programs",
+        "trigger_probability": 0.08,
+        "duration_months": 12,
+        "platform_impacts": {
+          "rideshare": 0.95,
+          "delivery": 0.98,
+          "general_gig": 0.97
+        },
+        "geographic_concentration": [
+          "san_francisco",
+          "new_york"
+        ],
+        "full_scale_timeline": 60
+      },
+      "ai_delivery_optimization": {
+        "name": "AI-Powered Route Optimization",
+        "trigger_probability": 0.25,
+        "impact_type": "positive",
+        "platform_impacts": {
+          "rideshare": 1.05,
+          "delivery": 1.1,
+          "general_gig": 1.07
+        },
+        "efficiency_gain": 0.1,
+        "volatility_reduction": 0.95
+      }
+    },
+    "baseline_probabilities": {
+      "recession_annual_probability": 0.1,
+      "gas_spike_annual_probability": 0.15,
+      "regulatory_change_annual_probability": 0.05,
+      "tech_disruption_annual_probability": 0.05
+    }
+  }
+}
