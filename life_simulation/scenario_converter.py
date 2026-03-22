@@ -17,7 +17,7 @@ monte_carlo_dir = os.path.join(parent_dir, 'monte_carlo_sim')
 sys.path.insert(0, parent_dir)
 sys.path.insert(0, monte_carlo_dir)
 
-from life_simulation.types import LifeTrajectory, LifeEvent, EventType, PortfolioState
+from life_simulation.models import LifeTrajectory, LifeEvent, EventType, PortfolioState
 from src.types import (
     AIScenario,
     ParameterShift,

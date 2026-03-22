@@ -12,7 +12,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from life_simulation.types import EventType, LifeEvent
+from life_simulation.models import EventType, LifeEvent
 from data_pipeline.loaders import DataLoader
 
 

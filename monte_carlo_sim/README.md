@@ -18,10 +18,10 @@ VarLend simulates **5,000 possible income futures** for a gig worker and determi
 
 ```bash
 cd monte_carlo_sim
-py -3 -m pip install -r requirements.txt
+py -3 -m pip install -r ../requirements.txt
 ```
 
-Requires: `numpy`, `scipy`, `python-dateutil`
+Uses the repo-root `requirements.txt` (includes `numpy`, `scipy`, `python-dateutil`, and the rest of the stack).
 
 ### Run Demo
 

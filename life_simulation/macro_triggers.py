@@ -12,7 +12,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from life_simulation.types import MacroShock
+from life_simulation.models import MacroShock
 from life_simulation.event_sampler import annual_to_monthly_probability
 from data_pipeline.loaders import DataLoader
 from monte_carlo_sim.src.types import GigType
