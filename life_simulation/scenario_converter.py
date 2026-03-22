@@ -10,10 +10,15 @@ from typing import Optional
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# Add paths for imports
+parent_dir = os.path.join(os.path.dirname(__file__), '..')
+monte_carlo_dir = os.path.join(parent_dir, 'monte_carlo_sim')
+
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, monte_carlo_dir)
 
 from life_simulation.types import LifeTrajectory, LifeEvent, EventType, PortfolioState
-from monte_carlo_sim.src.types import (
+from src.types import (
     AIScenario,
     ParameterShift,
     DiscreteJump,

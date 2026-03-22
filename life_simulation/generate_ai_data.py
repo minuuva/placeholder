@@ -8,22 +8,23 @@ This script runs the complete VarLend risk assessment pipeline:
 Output: trajectory + result objects needed for AI Layer visualization
 """
 
-from life_simulation.run_life_simulation import run_full_life_simulation
+from run_life_simulation import run_full_life_simulation
 from monte_carlo_sim.src.integration.profile_builder import CustomerApplication
 from monte_carlo_sim.src.types import LoanConfig
 
 # Example customer application
 customer = CustomerApplication(
-    full_name='John Doe',
-    platforms=['uber', 'doordash'],
-    hours_per_week=40,
+    platforms_and_hours=[
+        ('uber', 20.0, 12),      # (platform, hours/week, tenure_months)
+        ('doordash', 20.0, 6)
+    ],
     metro_area='national',
     months_as_gig_worker=12,
     has_vehicle=True,
     has_dependents=False,
     liquid_savings=2000,
-    monthly_rent=1200,
-    existing_debt_monthly=200,
+    monthly_fixed_expenses=1400,  # Rent + other fixed costs
+    existing_debt_obligations=200,
     credit_score_range=(600, 650),
     loan_request_amount=5000,
     requested_term_months=24,

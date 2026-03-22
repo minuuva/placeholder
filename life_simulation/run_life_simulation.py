@@ -8,15 +8,19 @@ from typing import Optional
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# Add parent directory and monte_carlo_sim to path
+parent_dir = os.path.join(os.path.dirname(__file__), '..')
+monte_carlo_dir = os.path.join(parent_dir, 'monte_carlo_sim')
+
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, monte_carlo_dir)
 
 from life_simulation.types import LifeTrajectory
 from life_simulation.trajectory_builder import build_life_trajectory
 from data_pipeline.loaders import DataLoader
 
 # Import Monte Carlo components
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'monte_carlo_sim'))
-from monte_carlo_sim.src.types import (
+from src.types import (
     SimulationConfig,
     LoanConfig,
     SimulationResult,
@@ -24,11 +28,11 @@ from monte_carlo_sim.src.types import (
     GigType,
     CorrelationMode
 )
-from monte_carlo_sim.src.integration.profile_builder import (
+from src.integration.profile_builder import (
     build_profile_from_application,
     CustomerApplication
 )
-from monte_carlo_sim.src.engine.monte_carlo import run_simulation, load_and_prepare
+from src.engine.monte_carlo import run_simulation, load_and_prepare
 
 
 def run_full_life_simulation(
