@@ -180,6 +180,79 @@ def plot_risk_summary_card(
     return output_path
 
 
+def plot_default_month_histogram(
+    result,
+    archetype: dict,
+    run_id: str = None,
+    output_path: Optional[Path] = None,
+    title: Optional[str] = None
+) -> Path:
+    """
+    Plot histogram of which months defaults occur.
+
+    Args:
+        result: SimulationResult object
+        archetype: Archetype dict
+        run_id: Unique identifier for this simulation run
+        output_path: Where to save chart
+        title: Custom title
+
+    Returns:
+        Path to saved chart
+    """
+    if output_path is None:
+        from ..config import Config
+        if run_id:
+            output_path = Config.CHART_DIR / f"default_histogram_{archetype['id']}_{run_id}.png"
+        else:
+            output_path = Config.CHART_DIR / f"default_histogram_{archetype['id']}.png"
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    if title is None:
+        title = f"{archetype['name']} - Default Month Distribution"
+
+    # Get default months from the result
+    if hasattr(result, 'default_months') and result.default_months is not None and len(result.default_months) > 0:
+        default_months = np.array(result.default_months)
+
+        # Create histogram
+        max_month = int(np.max(default_months)) + 1
+        bins = np.arange(0, max_month + 1, 1)
+
+        ax.hist(default_months, bins=bins, color='coral', alpha=0.7, edgecolor='black', align='left')
+        ax.set_xlabel('Month of Default', fontsize=12)
+        ax.set_ylabel('Number of Paths', fontsize=12)
+        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.grid(True, alpha=0.3, axis='y')
+
+        # Add statistics
+        mean_month = np.mean(default_months)
+        median_month = np.median(default_months)
+        ax.axvline(x=mean_month, color='red', linestyle='--', linewidth=2, label=f'Mean: {mean_month:.1f}')
+        ax.axvline(x=median_month, color='blue', linestyle='--', linewidth=2, label=f'Median: {median_month:.1f}')
+        ax.legend(loc='upper right')
+
+        # Add summary text
+        n_defaults = len(default_months)
+        p_default = result.p_default
+        ax.text(0.02, 0.98, f'Total Defaults: {n_defaults:,}\nP(default): {p_default:.1%}',
+                transform=ax.transAxes, fontsize=11, fontweight='bold',
+                va='top', ha='left', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+    else:
+        ax.text(0.5, 0.5, 'No Defaults Detected\n(P(default) ≈ 0%)',
+                ha='center', va='center', transform=ax.transAxes,
+                fontsize=16, fontweight='bold', color='green')
+        ax.set_title(title, fontsize=14, fontweight='bold')
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    return output_path
+
+
 def plot_risk_surface_2d(
     results_grid: List[List[Tuple[float, float, float]]],
     loan_amounts: List[float],

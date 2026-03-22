@@ -350,19 +350,18 @@ async def compare_scenarios(request: CompareRequest):
 
 def _generate_all_charts(output, run_id: str) -> List[ChartInfo]:
     """Generate essential visualization charts for simulation output."""
-    
+
     from ai_model.visualization.path_plotter import plot_income_paths
-    from ai_model.visualization.risk_charts import plot_default_timing_analysis
-    from ai_model.visualization.portfolio_charts import plot_income_evolution
+    from ai_model.visualization.risk_charts import plot_default_timing_analysis, plot_default_month_histogram
     from ai_model.visualization.event_timeline import plot_event_timeline
     from ai_model.visualization.advanced_charts import plot_risk_surface_3d
-    
+
     charts = []
-    
+
     arch = output.archetype_used
     result = output.result
     trajectory = output.trajectory
-    
+
     try:
         path = plot_income_paths(result, arch, run_id=run_id)
         charts.append(ChartInfo(
@@ -372,7 +371,7 @@ def _generate_all_charts(output, run_id: str) -> List[ChartInfo]:
         ))
     except Exception as e:
         print(f"Warning: Failed to generate income_paths chart: {e}")
-    
+
     try:
         path = plot_event_timeline(trajectory, run_id=run_id)
         charts.append(ChartInfo(
@@ -382,7 +381,7 @@ def _generate_all_charts(output, run_id: str) -> List[ChartInfo]:
         ))
     except Exception as e:
         print(f"Warning: Failed to generate event_timeline chart: {e}")
-    
+
     try:
         path = plot_default_timing_analysis(result, arch, run_id=run_id)
         charts.append(ChartInfo(
@@ -394,14 +393,14 @@ def _generate_all_charts(output, run_id: str) -> List[ChartInfo]:
         print(f"Warning: Failed to generate default_timing chart: {e}")
 
     try:
-        path = plot_income_evolution(trajectory, run_id=run_id)
+        path = plot_default_month_histogram(result, arch, run_id=run_id)
         charts.append(ChartInfo(
-            type="income_evolution",
+            type="default_histogram",
             path=f"/charts/{path.name}",
-            description="Income mean and volatility evolution over life trajectory"
+            description="Default month distribution histogram"
         ))
     except Exception as e:
-        print(f"Warning: Failed to generate income_evolution chart: {e}")
+        print(f"Warning: Failed to generate default_histogram chart: {e}")
     
     try:
         # Build customer app data object for 3D chart

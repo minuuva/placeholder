@@ -1411,9 +1411,9 @@ Results will appear below in just a moment...`,
                             {message.aiSimulation?.charts && message.aiSimulation.charts.length > 0 && (
                               <div className="mt-6 space-y-6">
                                 {message.aiSimulation.charts
-                                  .filter((c) => !c.type?.toLowerCase().includes('parameter_evolution') &&
-                                                 !c.description?.toLowerCase().includes('parameter evolution') &&
-                                                 !c.description?.toLowerCase().includes('income parameters'))
+                                  .filter((c) => !c.type?.toLowerCase().includes('income_evolution') &&
+                                                 !c.description?.toLowerCase().includes('income mean and volatility') &&
+                                                 !c.description?.toLowerCase().includes('parameter evolution'))
                                   .map((c) => (
                                   <div
                                     key={`${message.id}-${c.type}-${c.path}`}
