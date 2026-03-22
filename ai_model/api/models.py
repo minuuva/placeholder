@@ -38,7 +38,7 @@ class SimulateRequest(BaseModel):
     loan_preferences: Optional[LoanPreferences] = Field(None, description="Loan preferences")
     
     use_archetype: Optional[str] = Field(None, description="Pre-defined archetype to use")
-    random_seed: Optional[int] = Field(42, description="Random seed for reproducibility")
+    random_seed: Optional[int] = Field(None, description="Random seed for reproducibility (None = random each time)")
     generate_charts: bool = Field(True, description="Generate visualization charts")
     structured_scenario: Optional[Dict[str, Any]] = Field(
         None,
@@ -55,7 +55,7 @@ class CompareRequest(BaseModel):
     scenario_a_overrides: Optional[Dict[str, Any]] = Field(None, description="Overrides for scenario A")
     scenario_b_overrides: Optional[Dict[str, Any]] = Field(None, description="Overrides for scenario B")
     
-    random_seed: Optional[int] = Field(42, description="Random seed")
+    random_seed: Optional[int] = Field(None, description="Random seed (None = random each time)")
     generate_charts: bool = Field(True, description="Generate charts")
 
 

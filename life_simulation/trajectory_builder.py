@@ -156,7 +156,9 @@ def build_narrative_trajectory(
     Note: This is a placeholder for future narrative mode implementation.
     For now, use build_life_trajectory with a fixed random_seed.
     """
-    return build_life_trajectory(archetype_id, n_months, random_seed=42, narrative_mode=True)
+    import time
+    dynamic_seed = int(time.time() * 1000) % (2**31)
+    return build_life_trajectory(archetype_id, n_months, random_seed=dynamic_seed, narrative_mode=True)
 
 
 def build_multiple_trajectories(

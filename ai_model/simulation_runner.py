@@ -177,7 +177,9 @@ class SimulationRunner:
         
         time_horizon = scenario.get("time_horizon_months", Config.DEFAULT_TIME_HORIZON_MONTHS)
         n_paths = scenario.get("n_paths", Config.DEFAULT_N_PATHS)
-        random_seed = scenario.get("random_seed", 42)
+        # Use provided seed or generate unique one from current time
+        import time
+        random_seed = scenario.get("random_seed") or int(time.time() * 1000) % (2**31)
 
         trajectory = build_life_trajectory(
             archetype_id=archetype["id"],

@@ -212,9 +212,15 @@ def plot_default_month_histogram(
     if title is None:
         title = f"{archetype['name']} - Default Month Distribution"
 
-    # Get default months from the result
-    if hasattr(result, 'default_months') and result.default_months is not None and len(result.default_months) > 0:
-        default_months = np.array(result.default_months)
+    # Get default months from the result - filter to only paths that actually defaulted
+    # result.default_month contains month of default (-1 if no default)
+    # result.defaulted is a boolean array of which paths defaulted
+    has_defaults = (hasattr(result, 'default_month') and hasattr(result, 'defaulted') and
+                    result.default_month is not None and result.defaulted is not None and
+                    np.sum(result.defaulted) > 0)
+
+    if has_defaults:
+        default_months = result.default_month[result.defaulted]
 
         # Create histogram
         max_month = int(np.max(default_months)) + 1

@@ -11,8 +11,8 @@
   ],
   "hours_per_week": 40.0,
   "metro": "san_francisco",
-  "experience_months": 24,
-  "skill_level": 1.064377516497364,
+  "experience_months": 12,
+  "skill_level": 1.0512989871492306,
   "skill_growth_rate": 0.04,
   "diversification_probability": 0.3,
   "platform_add_rate": 0.08,
@@ -21,15 +21,15 @@
     "vehicle_repair_probability": 1.2,
     "health_issue_probability": 1.0,
     "platform_deactivation_probability": 0.8,
-    "housing_instability_probability": 0.9,
+    "housing_instability_probability": 1.2,
     "positive_event_probability": 0.9
   },
-  "emergency_fund_weeks": 6,
+  "emergency_fund_weeks": 1,
   "debt_to_income_ratio": 0.062197564343380314,
-  "default_risk_category": "low",
+  "default_risk_category": "medium",
   "recommended_loan_amount_range": [
-    9646,
-    25724
+    6431,
+    19293
   ],
-  "recommended_loan_term_months": 36
+  "recommended_loan_term_months": 24
 }

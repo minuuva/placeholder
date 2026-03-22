@@ -95,7 +95,7 @@ def run_api(input_data: dict) -> dict:
         config = SimulationConfig(
             n_paths=int(config_data.get("n_paths", 5000)),
             horizon_months=int(config_data.get("horizon_months", 24)),
-            random_seed=config_data.get("random_seed", 42),
+            random_seed=config_data.get("random_seed") or int(__import__('time').time() * 1000) % (2**31),
         )
 
         # Build loan config

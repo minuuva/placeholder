@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       loan_preferences: body.loanPreferences ?? undefined,
       structured_scenario: body.structuredScenario ?? undefined,
       use_archetype: body.useArchetype ?? undefined,
-      random_seed: typeof body.randomSeed === "number" ? body.randomSeed : 42,
+      random_seed: typeof body.randomSeed === "number" ? body.randomSeed : undefined,
       generate_charts: body.generateCharts !== false,
     };
 

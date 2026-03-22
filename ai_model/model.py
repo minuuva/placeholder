@@ -145,7 +145,7 @@ class VarLendModel:
         # Simulation settings
         time_horizon_months: int = 60,
         n_paths: int = 5000,
-        random_seed: int = 42,
+        random_seed: int = None,
         archetype_override: Optional[str] = None,
         
         # Output settings
