@@ -119,14 +119,14 @@ export function TeamSection() {
       </h2>
 
       {/* Team cards */}
-      <div ref={cardsRef} className="grid md:grid-cols-3 gap-8 max-w-5xl">
+      <div ref={cardsRef} className="grid md:grid-cols-3 gap-10 w-full">
         {TEAM_MEMBERS.map((member) => (
           <div
             key={member.name}
-            className="team-card group relative p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-300"
+            className="team-card group relative p-8 rounded-2xl bg-white/[0.04] border border-white/[0.1] hover:border-amber-500/30 hover:bg-white/[0.06] transition-all duration-300"
           >
             {/* Photo */}
-            <div className="relative w-24 h-24 mx-auto mb-6 rounded-2xl overflow-hidden bg-white/[0.05]">
+            <div className="relative w-40 h-40 mx-auto mb-8 rounded-2xl overflow-hidden border-2 border-white/[0.1]">
               <Image
                 src={member.image}
                 alt={member.name}
@@ -136,25 +136,25 @@ export function TeamSection() {
             </div>
 
             {/* Name */}
-            <h3 className="text-xl font-display font-semibold text-white text-center mb-1">
+            <h3 className="text-2xl font-display font-semibold text-white text-center mb-2">
               {member.name}
             </h3>
 
             {/* Role & Year */}
-            <p className="text-sm text-white/50 text-center mb-4">
+            <p className="text-base text-white/70 text-center mb-6">
               {member.role} &middot; {member.year}
             </p>
 
             {/* Company & Location */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-center gap-2 text-xs text-white/40">
-                <svg className="w-3.5 h-3.5 text-amber-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="space-y-3">
+              <div className="flex items-center justify-center gap-2 text-sm text-white/60">
+                <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <span>{member.company}</span>
               </div>
-              <div className="flex items-center justify-center gap-2 text-xs text-white/40">
-                <svg className="w-3.5 h-3.5 text-amber-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="flex items-center justify-center gap-2 text-sm text-white/60">
+                <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
