@@ -251,7 +251,7 @@ Return valid JSON only. Only extract NEW information - don't re-extract params a
         );
 
         extraction = {
-          extractedParams: mergedParams as ExtractedParams,
+          extractedParams: mergedParams as unknown as ExtractedParams,
           missingParams,
           confidence: parsed.confidence || "medium",
           clarifyingNote: parsed.clarifyingNote,
