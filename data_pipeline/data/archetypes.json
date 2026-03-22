@@ -4,7 +4,7 @@
     "version": "1.0",
     "description": "Gig worker archetype personas for VarLend risk modeling",
     "source": "JPMorgan Chase Institute + Gridwise + industry research",
-    "count": 5
+    "count": 6
   },
   "archetypes": [
     {
@@ -180,6 +180,45 @@
         6000
       ],
       "recommended_loan_term_months": 18
+    },
+    {
+      "id": "custom_user",
+      "name": "Custom User (custom_user)",
+      "description": "Custom archetype built from user data: 2 platforms, $3600/mo",
+      "base_mu": 3600.0,
+      "base_sigma": 985.1316861254411,
+      "coefficient_of_variation": 0.2736476905904003,
+      "platforms": [
+        "uber",
+        "doordash"
+      ],
+      "hours_per_week": 40.0,
+      "metro": "national",
+      "experience_months": 15,
+      "skill_level": 1.0554517744447955,
+      "skill_growth_rate": 0.04,
+      "diversification_probability": 0.3,
+      "platform_add_rate": 0.08,
+      "churn_risk": 0.1,
+      "event_modifiers": {
+        "vehicle_repair_probability": 1.2,
+        "health_issue_probability": 1.0,
+        "platform_deactivation_probability": 0.8,
+        "housing_instability_probability": 1.2,
+        "positive_event_probability": 0.9
+      },
+      "emergency_fund_weeks": 2,
+      "debt_to_income_ratio": 0.027777777777777776,
+      "credit_score_range": [
+        630,
+        670
+      ],
+      "default_risk_category": "medium",
+      "recommended_loan_amount_range": [
+        7200,
+        21600
+      ],
+      "recommended_loan_term_months": 24
     }
   ]
 }

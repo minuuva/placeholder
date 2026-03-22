@@ -145,13 +145,27 @@ VarLend/
 │   ├── run_life_simulation.py # Layer 1 + Layer 2 integration
 │   └── test_life_simulation.py # Comprehensive test suite
 │
-├── ai_layer/                ⏳ TODO: Scenario generation
-│   ├── scenario_parser.py   # Natural language → parameters
-│   └── claude_client.py     # Claude API integration
-│
-└── visualization/           ⏳ TODO: Dashboard
-    ├── dashboard.py         # Streamlit app
-    └── charts.py            # Risk visualizations
+├── ai_model/               ✅ COMPLETE (Layer 3)
+│   ├── model.py            # Main model (USE THIS)
+│   ├── quick_start.py      # Quick test script
+│   ├── example_usage.py    # Comprehensive examples
+│   ├── parameter_extractor.py  # NL query parsing
+│   ├── archetype_builder.py    # Custom archetype building
+│   ├── result_summarizer.py    # AI summary generation
+│   ├── simulation_runner.py    # Pipeline orchestrator (for API)
+│   ├── llm_client.py       # Multi-provider LLM interface
+│   ├── validation.py       # Input validation
+│   ├── config.py           # Configuration
+│   ├── api/                # REST API
+│   │   ├── server.py       # FastAPI server
+│   │   ├── models.py       # Pydantic schemas
+│   │   └── middleware.py   # CORS, rate limiting
+│   └── visualization/      # 6 chart types
+│       ├── path_plotter.py
+│       ├── risk_charts.py
+│       ├── portfolio_charts.py
+│       ├── event_timeline.py
+│       └── comparison_plots.py
 ```
 
 ---
@@ -201,34 +215,62 @@ print(f"P(default) = {default_prob:.1%}")
 
 ---
 
-## Next Steps
+## Usage
 
-### Priority 1: AI Layer (Optional Enhancement)
+### AI Model (Main Entry Point)
 
-Natural language scenario generation:
-- Claude API integration
-- Prompt: "What if gas prices spike 40%?" → Parameter adjustments
-- Comparative analysis (baseline vs. scenario)
+```python
+from ai_model.model import assess_loan
 
-**Dependencies:** Life simulation complete ✅
+# Assess a loan application
+assessment = assess_loan(
+    loan_amount=5000,
+    loan_term_months=24,
+    monthly_income=2500,
+    platforms=["uber", "doordash"],
+    user_prompt="Experienced driver, 18 months on platforms"
+)
 
-### Priority 2: Visualization
+# Check decision
+print(f"Decision: {'APPROVED' if assessment.approved else 'DECLINED'}")
+print(f"Default Risk: {assessment.default_probability:.1%}")
+print(assessment.executive_summary)
+```
 
-Streamlit dashboard:
-- Archetype comparison
-- Risk curves (P(default) over time)
-- Scenario impact charts
-- Live trajectory visualization
-- Life event timeline display
+### Quick Start
 
-**Dependencies:** Monte Carlo + Life Simulation complete ✅
+```bash
+# Test the model
+py -m ai_model.quick_start
 
-### Priority 3: Production Hardening
+# Or run examples
+py ai_model/example_usage.py
 
-- API endpoints for loan evaluation
-- Database integration for customer applications
-- Performance optimization (parallel simulation)
-- Deployment configuration
+# Or start REST API
+py -m uvicorn ai_model.api.server:app --reload
+```
+
+### REST API
+
+```bash
+# Start server
+py -m uvicorn ai_model.api.server:app --reload --host 0.0.0.0 --port 8000
+
+# Test endpoint
+curl -X POST http://localhost:8000/api/simulate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "5 year projection for diversified worker",
+    "user_data": {
+      "platforms": ["uber", "doordash"],
+      "hours_per_week": 40,
+      "monthly_income_estimate": 2500
+    },
+    "generate_charts": true
+  }'
+```
+
+API Documentation: http://localhost:8000/docs
 
 ---
 
@@ -282,10 +324,16 @@ Streamlit dashboard:
    - Full integration with Monte Carlo
    - Comprehensive test suite (7/7 passing)
 
-⏳ AI Layer: 0% (optional)
-⏳ Visualization: 0% (ready to start)
+✅ AI Model (Layer 3): 100% complete
+   - Natural language input processing
+   - Custom archetype building
+   - Full pipeline integration
+   - 6 visualization charts
+   - AI-powered summaries (Claude API)
+   - REST API with FastAPI
+   - Comprehensive examples
 
-Total Project: ~70% complete
+Total Project: 100% complete
 ```
 
 **Ready for hackathon:** Three-layer architecture complete! Data pipeline, Monte Carlo simulation, and Life Simulation Engine are production-quality, fully tested, and integrated. The system can now model realistic gig worker trajectories with dynamic events and portfolio evolution.

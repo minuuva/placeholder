@@ -13,7 +13,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from life_simulation.types import LifeEvent, EventType, PortfolioState
+from life_simulation.models import LifeEvent, EventType, PortfolioState
 
 
 def calculate_debt_cascade(

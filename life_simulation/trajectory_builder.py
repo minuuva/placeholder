@@ -16,7 +16,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from life_simulation.types import LifeTrajectory, LifeEvent, PortfolioState, MacroShock
+from life_simulation.models import LifeTrajectory, LifeEvent, PortfolioState, MacroShock
 from life_simulation.event_sampler import sample_all_events_for_month
 from life_simulation.portfolio_evolution import (
     create_initial_portfolio_state,

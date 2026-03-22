@@ -5,7 +5,7 @@ Generates month-by-month life events, portfolio evolution, and dynamic parameter
 Feeds compiled AIScenario objects into the Monte Carlo engine for realistic life trajectories.
 """
 
-from .types import (
+from .models import (
     EventType,
     LifeEvent,
     PortfolioState,
