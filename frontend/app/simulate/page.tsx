@@ -11,10 +11,6 @@ import {
   type AiLayerLoanPreferences,
 } from "@/lib/aiLayer";
 
-// Password for demo access
-const DEMO_PASSWORD = "Test123";
-const AUTH_KEY = "lasso_demo_auth";
-
 // Simple unique ID generator
 let idCounter = 0;
 function generateId(): string {
@@ -315,127 +311,7 @@ function DataCollectionProgress({ collected, total }: { collected: number; total
   );
 }
 
-// Password Gate Component
-function PasswordGate({ onAuthenticated }: { onAuthenticated: () => void }) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
-  const [isShaking, setIsShaking] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === DEMO_PASSWORD) {
-      sessionStorage.setItem(AUTH_KEY, "true");
-      onAuthenticated();
-    } else {
-      setError(true);
-      setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 500);
-      setPassword("");
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-6">
-      {/* Background effects */}
-      <div className="fixed inset-0 -z-10">
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]"
-          style={{
-            background: "radial-gradient(circle at center, rgba(255,159,64,0.08) 0%, transparent 60%)",
-            filter: "blur(60px)",
-          }}
-        />
-      </div>
-
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-              <span className="text-white font-bold text-xl">L</span>
-            </div>
-            <span className="text-white font-display font-bold text-2xl tracking-tight">Lasso</span>
-          </Link>
-          <h1 className="text-2xl font-display font-bold text-white mb-2">Risk Console Access</h1>
-          <p className="text-white/50 text-sm">Enter the demo password to continue</p>
-        </div>
-
-        {/* Password Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className={`relative ${isShaking ? "animate-shake" : ""}`}>
-            <input
-              ref={inputRef}
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError(false);
-              }}
-              placeholder="Enter password"
-              className={`w-full px-4 py-4 rounded-xl bg-white/[0.05] border text-white text-center text-lg tracking-widest placeholder-white/30 focus:outline-none transition-all ${
-                error
-                  ? "border-red-500/50 focus:border-red-500"
-                  : "border-white/[0.1] focus:border-amber-500/50"
-              }`}
-            />
-            {error && (
-              <p className="absolute -bottom-6 left-0 right-0 text-center text-red-400 text-sm">
-                Incorrect password
-              </p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-semibold text-lg transition-all duration-200 shadow-lg shadow-orange-500/20"
-          >
-            Access Console
-          </button>
-        </form>
-
-        {/* Back link */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/"
-            className="text-white/40 hover:text-white/70 text-sm transition-colors inline-flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to home
-          </Link>
-        </div>
-
-        {/* Demo hint */}
-        <div className="mt-12 text-center">
-          <p className="text-white/20 text-xs">
-            HooHacks 2026 Demo
-          </p>
-        </div>
-      </div>
-
-      {/* Shake animation style */}
-      <style jsx>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-          20%, 40%, 60%, 80% { transform: translateX(4px); }
-        }
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
-    </div>
-  );
-}
-
 export default function SimulateHub() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [chats, setChats] = useState<Chat[]>(INITIAL_CHATS);
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -449,12 +325,6 @@ export default function SimulateHub() {
   const [applicantBundle, setApplicantBundle] = useState<ApplicantAiBundle | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  // Check authentication on mount
-  useEffect(() => {
-    const auth = sessionStorage.getItem(AUTH_KEY);
-    setIsAuthenticated(auth === "true");
-  }, []);
 
   // 11 applicant params (no credit score)
   const totalParams = 11;
@@ -1077,24 +947,6 @@ Next: use the input below to describe optional macro or life events and layer st
     });
 
   const showWelcome = messages.length === 0;
-
-  // Show loading state while checking auth
-  if (isAuthenticated === null) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="flex gap-1">
-          <div className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-          <div className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-          <div className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
-        </div>
-      </div>
-    );
-  }
-
-  // Show password gate if not authenticated
-  if (!isAuthenticated) {
-    return <PasswordGate onAuthenticated={() => setIsAuthenticated(true)} />;
-  }
 
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-white overflow-hidden">

@@ -13,11 +13,6 @@ const DATA_SOURCES = [
   { name: "Bureau of Labor Statistics", url: "https://www.bls.gov" },
 ];
 
-const SOCIAL_LINKS = [
-  { name: "GitHub", url: "https://github.com", icon: "github" },
-  { name: "LinkedIn", url: "https://linkedin.com", icon: "linkedin" },
-  { name: "Twitter", url: "https://twitter.com", icon: "twitter" },
-];
 
 export function Footer() {
   const footerRef = useRef<HTMLElement>(null);
@@ -75,34 +70,19 @@ export function Footer() {
           </h2>
 
           {/* Email link - prominent with gradient hover */}
-          <div className="mb-10">
+          <div>
             <span className="text-[10px] text-white/25 uppercase tracking-[0.15em] mb-3 block font-medium">
               Start a conversation
             </span>
             <a
-              href="mailto:hello@lasso.io"
+              href="mailto:ret7qp@virginia.edu"
               className="group inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-white/80 hover:text-gradient-accent transition-all duration-300"
             >
-              <span>hello@lasso.io</span>
+              <span>ret7qp@virginia.edu</span>
               <svg className="w-5 h-5 text-amber-400/50 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </a>
-          </div>
-
-          {/* Social links - pill style */}
-          <div className="flex flex-wrap items-center gap-3">
-            {SOCIAL_LINKS.map((link) => (
-              <a
-                key={link.name}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 rounded-full border border-white/10 text-sm text-white/40 hover:text-white/80 hover:border-white/20 hover:bg-white/[0.03] transition-all duration-300"
-              >
-                {link.name}
-              </a>
-            ))}
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import {
   PreviewSection,
   ManifestoSection,
   PartnersSection,
+  TeamSection,
   Footer,
 } from "@/components/sections";
 
@@ -30,8 +31,11 @@ export default function Home() {
       {/* Section 4: Live Preview */}
       <PreviewSection />
 
-      {/* Section 6: Partners & Data Sources */}
+      {/* Section 5: Partners & Data Sources */}
       <PartnersSection />
+
+      {/* Section 6: Team */}
+      <TeamSection />
 
       {/* Footer */}
       <Footer />
