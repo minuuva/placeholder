@@ -60,12 +60,15 @@ def _tier_from_p(p: float) -> RiskTier:
         return RiskTier.NEAR_PRIME
     if p < thresholds["subprime"]:
         return RiskTier.SUBPRIME
-    return RiskTier.DECLINE
+    return RiskTier.HIGH_RISK
 
 
 def evaluate_loan(simulation: SimulationResult, loan: LoanConfig) -> LoanRecommendation:
     """
-    Produce an approval decision, tier, and human-readable rationale strings.
+    Produce risk assessment tier and human-readable rationale for bank review.
+    
+    Lasso provides information expansion for banks; the final lending decision
+    remains with the institution.
 
     Parameters
     ----------
@@ -76,7 +79,6 @@ def evaluate_loan(simulation: SimulationResult, loan: LoanConfig) -> LoanRecomme
     """
     p = simulation.p_default
     tier = _tier_from_p(p)
-    approved = tier != RiskTier.DECLINE
 
     reasoning: list[str] = []
     if simulation.cvar_95 > loan.amount:
@@ -110,7 +112,6 @@ def evaluate_loan(simulation: SimulationResult, loan: LoanConfig) -> LoanRecomme
 
     alts: list[dict[str, Any]] = []
     return LoanRecommendation(
-        approved=approved,
         optimal_amount=loan.amount,
         optimal_term_months=loan.term_months,
         optimal_rate=loan.annual_rate,
@@ -126,11 +127,11 @@ def suggest_restructuring(
     simulate_fn: Callable[[float], SimulationResult],
 ) -> dict[str, Any] | None:
     """
-    If the loan is DECLINE, binary-search a smaller principal down to 25% of requested.
+    If the loan is HIGH_RISK, binary-search a smaller principal down to 25% of requested.
 
     Returns the largest amount whose simulated P(default) stays below the SUBPRIME ceiling.
     """
-    if simulation.recommended_loan.risk_tier != RiskTier.DECLINE:
+    if simulation.recommended_loan.risk_tier != RiskTier.HIGH_RISK:
         return None
     
     thresholds = _get_risk_tier_thresholds()

@@ -683,7 +683,7 @@ export function HeroSection() {
                       Gas Spike Stress
                     </span>
                     <span className="px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide bg-red-400/15 text-red-400 rounded-md border border-red-400/20">
-                      Decline
+                      High Risk
                     </span>
                   </div>
                   <div className="flex items-baseline gap-2">

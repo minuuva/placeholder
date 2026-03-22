@@ -15,6 +15,7 @@ from typing import Optional, List, Tuple
 def plot_default_timing_analysis(
     result,
     archetype: dict,
+    run_id: str = None,
     output_path: Optional[Path] = None,
     title: Optional[str] = None
 ) -> Path:
@@ -24,6 +25,7 @@ def plot_default_timing_analysis(
     Args:
         result: SimulationResult object
         archetype: Archetype dict
+        run_id: Unique identifier for this simulation run
         output_path: Where to save chart
         title: Custom title
     
@@ -32,9 +34,12 @@ def plot_default_timing_analysis(
     """
     if output_path is None:
         from ..config import Config
-        output_path = Config.CHART_DIR / f"default_timing_{archetype['id']}.png"
+        if run_id:
+            output_path = Config.CHART_DIR / f"default_timing_{archetype['id']}_{run_id}.png"
+        else:
+            output_path = Config.CHART_DIR / f"default_timing_{archetype['id']}.png"
     
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    fig, ax1 = plt.subplots(1, 1, figsize=(10, 6))
     
     if title is None:
         title = f"{archetype['name']} - Default Timing Analysis"
@@ -48,37 +53,21 @@ def plot_default_timing_analysis(
         ax1.barh(perc_names, perc_values, color='coral', alpha=0.7, edgecolor='black')
         ax1.set_xlabel('Month of Default', fontsize=11)
         ax1.set_ylabel('Percentile', fontsize=11)
-        ax1.set_title('Default Timing by Percentile', fontsize=13, fontweight='bold')
+        ax1.set_title('When Defaults Occur (Among Defaulting Paths)', fontsize=13, fontweight='bold')
         ax1.grid(True, alpha=0.3, axis='x')
         
         for i, (label, value) in enumerate(zip(perc_names, perc_values)):
             ax1.text(value, i, f'  M{value:.1f}', va='center', fontweight='bold')
+        
+        default_prob = result.p_default
+        ax1.text(0.02, 0.98, f'Overall P(default): {default_prob:.1%}',
+                transform=ax1.transAxes, fontsize=11, fontweight='bold',
+                va='top', ha='left', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
     else:
         ax1.text(0.5, 0.5, 'No Defaults Detected\n(P(default) ~= 0%)',
                 ha='center', va='center', transform=ax1.transAxes,
                 fontsize=14, fontweight='bold', color='green')
-        ax1.set_title('Default Timing by Percentile', fontsize=13, fontweight='bold')
-    
-    n_months = result.raw_paths.shape[1]
-    defaults_by_month = np.zeros(n_months)
-    
-    base_mu = archetype["base_mu"]
-    debt_ratio = archetype["debt_to_income_ratio"]
-    survival_threshold = base_mu * 0.25 + base_mu * debt_ratio
-    
-    for path in result.raw_paths:
-        for month, income in enumerate(path):
-            if income < survival_threshold:
-                defaults_by_month[month] += 1
-                break
-    
-    defaults_pct = (defaults_by_month / result.raw_paths.shape[0]) * 100
-    
-    ax2.bar(range(n_months), defaults_pct, color='darkred', alpha=0.7, edgecolor='black')
-    ax2.set_xlabel('Month', fontsize=11)
-    ax2.set_ylabel('Default Rate (%)', fontsize=11)
-    ax2.set_title('Default Rate by Month', fontsize=13, fontweight='bold')
-    ax2.grid(True, alpha=0.3, axis='y')
+        ax1.set_title('When Defaults Occur (Among Defaulting Paths)', fontsize=13, fontweight='bold')
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
@@ -128,10 +117,10 @@ def plot_risk_summary_card(
         f"  CVaR (95%): ${result.cvar_95:,.2f}",
         f"  Risk Tier: {result.recommended_loan.risk_tier.value.upper()}",
         f"",
-        f"RECOMMENDATION: {'APPROVED' if result.recommended_loan.approved else 'DECLINED'}",
-        f"  Optimal Amount: ${result.recommended_loan.optimal_amount:,.0f}",
-        f"  Optimal Term: {result.recommended_loan.optimal_term_months} months",
-        f"  Optimal Rate: {result.recommended_loan.optimal_rate:.1%}",
+        f"ANALYZED STRUCTURE:",
+        f"  Amount: ${result.recommended_loan.optimal_amount:,.0f}",
+        f"  Term: {result.recommended_loan.optimal_term_months} months",
+        f"  Rate: {result.recommended_loan.optimal_rate:.1%}",
     ]
     
     ax_main.text(0.05, 0.95, '\n'.join(metrics_text),

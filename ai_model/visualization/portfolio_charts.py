@@ -84,6 +84,7 @@ def plot_portfolio_evolution(
 
 def plot_income_evolution(
     trajectory,
+    run_id: str = None,
     output_path: Optional[Path] = None,
     title: Optional[str] = None
 ) -> Path:
@@ -92,6 +93,7 @@ def plot_income_evolution(
     
     Args:
         trajectory: LifeTrajectory object
+        run_id: Unique identifier for this simulation run
         output_path: Where to save chart
         title: Custom title
     
@@ -100,7 +102,10 @@ def plot_income_evolution(
     """
     if output_path is None:
         from ..config import Config
-        output_path = Config.CHART_DIR / f"income_evolution_{trajectory.archetype_id}.png"
+        if run_id:
+            output_path = Config.CHART_DIR / f"income_evolution_{trajectory.archetype_id}_{run_id}.png"
+        else:
+            output_path = Config.CHART_DIR / f"income_evolution_{trajectory.archetype_id}.png"
     
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 12))
     

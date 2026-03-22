@@ -108,7 +108,7 @@ def run_simulation(
     scenario:
         Optional AI scenario with deterministic shifts and discrete jumps (DEPRECATED - use archetype_data for per-path events).
     refine_alternatives:
-        When ``False``, skip DECLINE restructuring search (avoids nested recursion).
+        When ``False``, skip HIGH_RISK restructuring search (avoids nested recursion).
     archetype_data:
         Archetype configuration for per-path life event sampling. If provided, enables path-independent event sampling.
 
@@ -261,7 +261,6 @@ def run_simulation(
     p90 = risk_metrics.income_envelope(income, [90.0])[0]
 
     placeholder = LoanRecommendation(
-        approved=False,
         optimal_amount=loan.amount,
         optimal_term_months=loan.term_months,
         optimal_rate=loan.annual_rate,
@@ -290,7 +289,7 @@ def run_simulation(
     rec = loan_evaluator.evaluate_loan(sim, loan)
     sim.recommended_loan = rec
 
-    if refine_alternatives and rec.risk_tier == RiskTier.DECLINE:
+    if refine_alternatives and rec.risk_tier == RiskTier.HIGH_RISK:
 
         def _sim_amt(amt: float) -> SimulationResult:
             lc = LoanConfig(amount=amt, term_months=loan.term_months, annual_rate=loan.annual_rate)

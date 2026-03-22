@@ -50,7 +50,6 @@ function formatMetrics(data: AiLayerSimulateResponse): string {
     `Expected loss: $${Math.round(m.expected_loss).toLocaleString()}`,
     `CVaR (95%): $${Math.round(m.cvar_95).toLocaleString()}`,
     `Risk tier: ${m.risk_tier}`,
-    `Approved: ${m.approved ? "yes" : "no"}`,
   ].join("\n");
 }
 
@@ -178,10 +177,9 @@ export function AIChat() {
           assistantBody += `\n\n**Simulation error:** ${detail || simResponse.statusText}\n\nSet AI_MODEL_API_BASE_URL in .env.local and run the Python FastAPI server.`;
         } else {
           const summaryBlock =
+            aiSimulation.summary ||
             aiSimulation.quick_summary ||
-            (aiSimulation.summary
-              ? aiSimulation.summary.slice(0, 600)
-              : "");
+            "";
           assistantBody += summaryBlock ? `\n\n${summaryBlock}` : "";
           const metricsText = formatMetrics(aiSimulation);
           if (metricsText) assistantBody += `\n\n${metricsText}`;

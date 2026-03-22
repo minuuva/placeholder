@@ -172,21 +172,18 @@ def compare_static_vs_dynamic(
             "p_default": static_result.p_default,
             "expected_loss": static_result.expected_loss,
             "cvar_95": static_result.cvar_95,
-            "risk_tier": static_result.recommended_loan.risk_tier.value,
-            "approved": static_result.recommended_loan.approved
+            "risk_tier": static_result.recommended_loan.risk_tier.value
         },
         "dynamic": {
             "p_default": dynamic_result.p_default,
             "expected_loss": dynamic_result.expected_loss,
             "cvar_95": dynamic_result.cvar_95,
-            "risk_tier": dynamic_result.recommended_loan.risk_tier.value,
-            "approved": dynamic_result.recommended_loan.approved
+            "risk_tier": dynamic_result.recommended_loan.risk_tier.value
         },
         "delta": {
             "p_default_change": dynamic_result.p_default - static_result.p_default,
             "expected_loss_change": dynamic_result.expected_loss - static_result.expected_loss,
-            "risk_tier_changed": static_result.recommended_loan.risk_tier != dynamic_result.recommended_loan.risk_tier,
-            "approval_changed": static_result.recommended_loan.approved != dynamic_result.recommended_loan.approved
+            "risk_tier_changed": static_result.recommended_loan.risk_tier != dynamic_result.recommended_loan.risk_tier
         }
     }
     

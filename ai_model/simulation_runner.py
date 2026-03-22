@@ -33,6 +33,7 @@ from .config import Config
 class SimulationOutput:
     """Complete simulation output with trajectory and results."""
     
+    run_id: str
     trajectory: LifeTrajectory
     result: SimulationResult
     archetype_used: dict
@@ -84,7 +85,6 @@ class SimulationOutput:
                     k: float(v) for k, v in self.result.time_to_default_percentiles.items()
                 },
                 "recommended_loan": {
-                    "approved": self.result.recommended_loan.approved,
                     "risk_tier": self.result.recommended_loan.risk_tier.value,
                     "optimal_amount": float(self.result.recommended_loan.optimal_amount),
                     "optimal_term_months": int(self.result.recommended_loan.optimal_term_months),
@@ -135,7 +135,8 @@ class SimulationRunner:
         """
         import time
         start_time = time.time()
-        
+        run_id = f"{int(start_time * 1000)}"
+
         scenario = request.scenario
         
         archetype_base = scenario.get("archetype_base", "steady_sarah")
@@ -185,9 +186,12 @@ class SimulationRunner:
         )
 
         merged_ai = self._build_merged_ai_scenario(scenario, customer_app, time_horizon)
-        if merged_ai is not None and not merged_ai.get("parameter_shifts") and not merged_ai.get(
-            "discrete_jumps"
-        ):
+        print(f"[DEBUG] Raw scenario dict: {scenario}")
+        print(f"[DEBUG] Merged AI scenario: {merged_ai}")
+        if merged_ai is not None:
+            print(f"[DEBUG] Scenario has {len(merged_ai.get('parameter_shifts', []))} shifts, {len(merged_ai.get('discrete_jumps', []))} jumps")
+        if merged_ai is not None and not merged_ai.get("parameter_shifts") and not merged_ai.get("discrete_jumps"):
+            print(f"[DEBUG] Scenario dropped - no parameter_shifts or discrete_jumps found")
             merged_ai = None
 
         result = run_full_life_simulation(
@@ -203,6 +207,7 @@ class SimulationRunner:
         execution_time = time.time() - start_time
         
         return SimulationOutput(
+            run_id=run_id,
             trajectory=trajectory,
             result=result,
             archetype_used=archetype,

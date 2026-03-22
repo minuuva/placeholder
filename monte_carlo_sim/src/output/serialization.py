@@ -158,7 +158,6 @@ def result_to_dict(result: SimulationResult, include_raw_paths: bool = False, n_
         "sample_paths": sample_paths,
         
         "loan_recommendation": {
-            "approved": bool(result.recommended_loan.approved),
             "optimal_amount": float(result.recommended_loan.optimal_amount),
             "optimal_term_months": int(result.recommended_loan.optimal_term_months),
             "optimal_rate": float(result.recommended_loan.optimal_rate),

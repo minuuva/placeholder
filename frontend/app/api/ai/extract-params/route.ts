@@ -125,10 +125,10 @@ REQUIRED PARAMETERS TO EXTRACT (about the applicant):
 
 EXTRACTION RULES:
 - Extract ONLY what is explicitly stated or strongly implied about the applicant
-- Convert relative terms: "full-time" = 35-40 hours, "part-time" = 15-25 hours
+- Convert relative terms: "full-time" = 40 hours, "part-time" = 20 hours
 - Convert time: "2 years" = 24 months, "a few months" = 3-6 months
 - If a parameter is NOT mentioned or cannot be inferred, set it to null
-- Be conservative - don't guess values
+- Use exact values when provided - do not round down or apply conservative estimates
 - Remember: the input is from a loan officer describing an applicant, not from the applicant themselves
 
 RESPONSE FORMAT (JSON):

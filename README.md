@@ -1,91 +1,164 @@
-# Lasso - Variable Income Lending Risk Assessment
+# Lasso - Volatility as Information, Not Risk
 
-AI-powered loan risk assessment system for gig economy workers with variable income streams.
+Monte Carlo risk assessment platform for gig worker loans. Transforms income volatility into actionable risk intelligence for banks, without relying on traditional credit scores.
 
-## Quick Start for UI Integration
+## What Makes Lasso Different
 
-### Run the Complete Test
-
-```bash
-py test_complete_pipeline.py
-```
-
-This generates:
-- **13 charts total**: 9 standard + 4 advanced 3D visualizations
-- Risk assessment JSON with approval decision, risk tier, default probability
-- Executive summary from AI
-
-### Use in Your UI
-
-```python
-from ai_model.model import VarLendModel
-
-model = VarLendModel()
-
-assessment = model.assess_loan_application(
-    user_prompt="Your natural language prompt here...",
-    loan_amount=5000,
-    loan_term_months=24,
-    monthly_income=3600,  # GROSS income
-    platforms=["uber", "doordash"],
-    hours_per_week=40,
-    liquid_savings=1800,
-    monthly_expenses=350,  # Should be realistic relative to NET income
-    existing_debt=100,
-    # Optional params...
-)
-
-# Returns BankRiskAssessment with:
-# - assessment.approved (bool)
-# - assessment.risk_tier (str)
-# - assessment.default_probability (float)
-# - assessment.executive_summary (str)
-# - assessment.charts (list of chart metadata)
-# - assessment.simulation_data (dict with full metrics)
-```
-
-### Output Structure
-
-Charts are saved to: `ai_model/outputs/charts/`
-
-**Standard Charts (9):**
-1. `income_paths_*.png` - Monte Carlo income trajectories
-2. `risk_summary_*.png` - Key risk metrics card
-3. `default_timing_*.png` - When defaults occur
-4. `portfolio_evolution_*.png` - Asset/debt evolution
-5. `event_timeline_*.png` - Life events impact
-6. `income_evolution_*.png` - Income parameters over time
-7. `risk_matrix_*.png` - Risk heatmap
-8. `variance_funnel_*.png` - Income uncertainty funnel
-9. `payment_burden_*.png` - Payment to income ratio
-
-**Advanced 3D Charts (4):**
-10. `risk_surface_3d_*.png` - 3D risk surface
-11. `volatility_surface_3d_*.png` - 3D volatility surface
-12. `stress_test_matrix_*.png` - Stress test scenarios
-13. `default_waterfall_*.png` - Default probability waterfall
+Lasso is an **information expansion tool** for banks, not a decision engine. We provide comprehensive risk profiles through Monte Carlo simulation of income volatility, life events, and macro shocks - enabling banks to make informed lending decisions about gig workers who lack traditional credit histories.
 
 ## Architecture
 
-- **ai_model/** - Main AI layer and orchestration
-- **monte_carlo_sim/** - Core income simulation engine
-- **life_simulation/** - Life trajectory and event modeling
-- **data_pipeline/** - Data loading and archetype management
+Three-layer Monte Carlo simulation system:
 
-## Key Components
+- **Layer 1: Core Monte Carlo Engine** (`monte_carlo_sim/`) - Jump-diffusion income model with vectorized path simulation
+- **Layer 2: Life Simulation Engine** (`life_simulation/`) - Probabilistic life events (vehicle repairs, health issues, platform disruptions) sampled per-path for true independence
+- **Layer 3: AI Scenario Generator** (`ai_model/`) - Natural language scenario interpretation and risk summarization
 
-- `ai_model/model.py` - Main VarLendModel class
-- `ai_model/api/server.py` - FastAPI REST API
-- `ai_model/visualization/*` - All chart generation
-- `test_complete_pipeline.py` - Reference implementation for UI
+## Tech Stack
 
-## Requirements
+**Backend (Python):**
+- FastAPI REST API (`ai_model/api/server.py`)
+- NumPy/SciPy for Monte Carlo simulation
+- LLM integration (Claude/OpenAI) for natural language processing
+- Matplotlib for visualization
 
-See root `requirements.txt` (covers the full project, including `monte_carlo_sim`).
+**Frontend (Next.js):**
+- React + TypeScript + Tailwind CSS
+- Conversational UI for applicant data collection
+- Real-time scenario stress testing
+- Dynamic chart rendering
 
-## Important Notes
+**Data Pipeline:**
+- FRED API integration for macro data
+- Pre-cached datasets (JPMorgan Institute, Gridwise Research)
+- Platform-specific income/expense calibration
 
-- Users report **GROSS income**
-- System calculates **NET income** internally for simulation
-- Expenses and debt should be realistic relative to NET income (~25-35% of net)
-- The simulation uses platform-specific hourly rates to calculate actual net income
+## Quick Start
+
+### 1. Backend Setup
+
+```bash
+# From repo root
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Set API key in .env
+echo "ANTHROPIC_API_KEY=your_key_here" > .env
+
+# Run backend
+python -m uvicorn ai_model.api.server:app --reload
+```
+
+Backend runs at `http://127.0.0.1:8000`
+
+### 2. Frontend Setup
+
+```bash
+cd frontend
+npm install
+
+# Set API keys in .env.local
+cp .env.local.example .env.local
+# Edit .env.local with your keys
+
+npm run dev
+```
+
+Frontend runs at `http://localhost:3000`
+
+## Visualization Output (5 Charts)
+
+Lasso generates 5 visualizations for each risk assessment:
+
+1. **Income Paths** - Monte Carlo trajectories with P10/P50/P90 bands and base income reference
+2. **Life Event Timeline** - Probabilistic life events and their income/expense impacts
+3. **Default Timing Analysis** - When defaults occur among defaulting paths (conditional percentiles)
+4. **Income Parameter Evolution** - How mean income and volatility change over the life trajectory
+5. **3D Risk Surface** - Default probability across loan amount/term combinations (shows optimization landscape)
+
+## API Usage
+
+### Simulate Endpoint
+
+```bash
+POST http://127.0.0.1:8000/api/simulate
+```
+
+Example request:
+
+```json
+{
+  "query": "Assess risk for this applicant",
+  "user_data": {
+    "platforms": ["uber", "lyft"],
+    "hours_per_week": 40,
+    "metro_area": "san_francisco",
+    "months_as_gig_worker": 18,
+    "has_vehicle": true,
+    "liquid_savings": 20000,
+    "monthly_fixed_expenses": 500,
+    "existing_debt_obligations": 1500
+  },
+  "loan_preferences": {
+    "amount": 5000,
+    "term_months": 6
+  },
+  "generate_charts": true
+}
+```
+
+Response includes:
+- **summary**: Detailed 300-500 word risk profile (LLM-generated)
+- **quick_summary**: 2-3 sentence overview
+- **metrics**: P(default), expected loss, CVaR 95%, risk tier
+- **charts**: Array of chart metadata with paths
+- **trajectory_info**: Life event sequence and portfolio evolution
+
+## Key Features
+
+### No Credit Scores
+Lasso assesses risk entirely from gig work patterns, income volatility, emergency buffers, and platform diversification. Designed for workers excluded from traditional credit systems.
+
+### True Path Independence
+Each Monte Carlo path samples its own unique sequence of life events using Poisson/Bernoulli distributions. No batch determinism - every simulation is probabilistically independent.
+
+### Scenario Stress Testing
+Natural language scenario interface: "What if gas prices spike 40% in month 8?" The AI interprets scenarios and applies parameter shifts to the Monte Carlo engine.
+
+### Information, Not Decisions
+Lasso provides neutral risk assessment data. Banks make the final lending decision. No "Approve/Decline" language - only risk tiers (LOW, MODERATE, HIGH_RISK).
+
+## Project Structure
+
+```
+.
+├── ai_model/              # Layer 3: AI orchestration & API
+│   ├── api/              # FastAPI endpoints
+│   ├── prompts/          # LLM system prompts
+│   └── visualization/    # Chart generation
+├── monte_carlo_sim/       # Layer 1: Core simulation engine
+│   └── src/
+│       ├── engine/       # Monte Carlo engine + path events
+│       ├── risk/         # Default detection & loan evaluation
+│       └── profiles/     # Income modeling
+├── life_simulation/       # Layer 2: Life trajectory builder
+│   ├── trajectory_builder.py
+│   ├── portfolio_evolution.py
+│   └── macro_triggers.py
+├── data_pipeline/         # Data ingestion & preprocessing
+│   ├── data/             # Pre-cached datasets
+│   └── transform/        # Income/expense calibration
+└── frontend/              # Next.js web application
+    ├── app/
+    ├── components/
+    └── lib/
+
+```
+
+## Development Notes
+
+- Monte Carlo paths: 5000 (configurable)
+- Time horizon: 24-36 months typical
+- Random seed: 42 (for reproducibility during development)
+- Chart filenames include unique `run_id` (timestamp) to prevent caching issues

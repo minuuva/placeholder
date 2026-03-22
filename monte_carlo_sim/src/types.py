@@ -53,7 +53,7 @@ class RiskTier(Enum):
     PRIME = "prime"
     NEAR_PRIME = "near_prime"
     SUBPRIME = "subprime"
-    DECLINE = "decline"
+    HIGH_RISK = "high_risk"
 
 
 @dataclass(frozen=True)
@@ -137,7 +137,6 @@ class PathResult:
 
 @dataclass
 class LoanRecommendation:
-    approved: bool
     optimal_amount: float
     optimal_term_months: int
     optimal_rate: float

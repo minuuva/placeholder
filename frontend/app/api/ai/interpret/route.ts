@@ -28,6 +28,7 @@ AIScenario JSON shape:
 Rules:
 - multiplicative magnitude must stay in [0.05, 3.0]. additive expenses can be any reasonable dollar delta per month.
 - Every parameter_shifts item must include exactly: target, type, magnitude, start_month, duration_months, decay.
+- ALWAYS include parameter_shifts array - never leave it empty for stress scenarios.
 - If the user names a catalog macro scenario, align shifts roughly with its economics (names are hints; encode as shifts/jumps):
   - recession_2008, recession_2020, inflation_slowdown_2022
   - gas_spike_moderate, gas_spike_severe
@@ -37,6 +38,66 @@ Rules:
 - If they say "starting month N", set start_month = N (0-based). If unknown, use 0 or a reasonable mid-horizon month.
 - Set should_run_simulation: true whenever they want to model a shock, stress, recession, spike, injury, policy change, or "what if X happens".
 - Set should_run_simulation: false for pure greetings or unrelated chat.
+
+EXAMPLES:
+
+Example 1 - Gas Spike Severe:
+User: "severe gas spike in month 8"
+Response: {
+  "response": "I'll model a severe gas price spike starting in month 8 for your rideshare work. This scenario assumes gas prices jump dramatically and stay elevated, significantly impacting your operating costs as an Uber/Lyft driver. The severe spike will reduce your effective income by about 25% and increase income volatility as demand patterns shift with higher transportation costs.",
+  "scenario": {
+    "narrative": "Severe gas spike starting month 8",
+    "parameter_shifts": [
+      {
+        "target": "expenses",
+        "type": "additive",
+        "magnitude": 250,
+        "start_month": 8,
+        "duration_months": 12,
+        "decay": "linear"
+      },
+      {
+        "target": "mu_base",
+        "type": "multiplicative",
+        "magnitude": 0.75,
+        "start_month": 8,
+        "duration_months": 12,
+        "decay": "snap_back"
+      }
+    ],
+    "discrete_jumps": []
+  },
+  "should_run_simulation": true
+}
+
+Example 2 - Recession:
+User: "what if recession hits in month 3"
+Response: {
+  "response": "I'll simulate a recession scenario starting in month 3. This models reduced demand for gig services, lower earnings per trip, and increased income volatility.",
+  "scenario": {
+    "narrative": "Recession starting month 3",
+    "parameter_shifts": [
+      {
+        "target": "mu_base",
+        "type": "multiplicative",
+        "magnitude": 0.70,
+        "start_month": 3,
+        "duration_months": 18,
+        "decay": "exponential"
+      },
+      {
+        "target": "sigma_base",
+        "type": "multiplicative",
+        "magnitude": 1.3,
+        "start_month": 3,
+        "duration_months": 18,
+        "decay": "exponential"
+      }
+    ],
+    "discrete_jumps": []
+  },
+  "should_run_simulation": true
+}
 
 Always respond with valid JSON including "response", "scenario", and "should_run_simulation".`;
 

@@ -15,6 +15,7 @@ from typing import Optional
 def plot_income_paths(
     result,
     archetype: dict,
+    run_id: str = None,
     output_path: Optional[Path] = None,
     n_paths_to_show: int = 200,
     title: Optional[str] = None
@@ -25,6 +26,7 @@ def plot_income_paths(
     Args:
         result: SimulationResult object
         archetype: Archetype dict with base parameters
+        run_id: Unique identifier for this simulation run
         output_path: Where to save chart (auto-generated if None)
         n_paths_to_show: Number of individual paths to display
         title: Custom chart title
@@ -34,7 +36,10 @@ def plot_income_paths(
     """
     if output_path is None:
         from ..config import Config
-        output_path = Config.CHART_DIR / f"income_paths_{archetype['id']}.png"
+        if run_id:
+            output_path = Config.CHART_DIR / f"income_paths_{archetype['id']}_{run_id}.png"
+        else:
+            output_path = Config.CHART_DIR / f"income_paths_{archetype['id']}.png"
     
     fig, ax = plt.subplots(figsize=(14, 8))
     
@@ -50,9 +55,10 @@ def plot_income_paths(
     ax.plot(result.p90_income_by_month, 'green', linewidth=2.5,
             label='P90 (best 10%)', linestyle='--', zorder=10)
     
-    base_mu = archetype["base_mu"]
-    ax.axhline(y=base_mu, color='black', linestyle=':', linewidth=2,
-               label=f'Base Income: ${base_mu:.0f}', alpha=0.7)
+    # Use actual mean from simulation (accounting for life events) instead of theoretical base_mu
+    actual_mean = float(np.mean(result.raw_paths[:, 0]))
+    ax.axhline(y=actual_mean, color='black', linestyle=':', linewidth=2,
+               label=f'Base Income: ${actual_mean:.0f}', alpha=0.7)
     
     if title is None:
         title = f"{archetype['name']} - Income Paths ({n_paths} simulations, {n_months} months)"

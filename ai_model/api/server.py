@@ -231,7 +231,7 @@ async def simulate(request: SimulateRequest):
         
         charts = []
         if request.generate_charts:
-            charts = _generate_all_charts(output)
+            charts = _generate_all_charts(output, output.run_id)
         
         execution_time = time.time() - start_time
         
@@ -243,8 +243,7 @@ async def simulate(request: SimulateRequest):
                 "p_default": float(output.result.p_default),
                 "expected_loss": float(output.result.expected_loss),
                 "cvar_95": float(output.result.cvar_95),
-                "risk_tier": output.result.recommended_loan.risk_tier.value,
-                "approved": output.result.recommended_loan.approved
+                "risk_tier": output.result.recommended_loan.risk_tier.value
             },
             trajectory_info={
                 "months": output.trajectory.months,
@@ -345,26 +344,14 @@ async def compare_scenarios(request: CompareRequest):
         )
 
 
-def _generate_all_charts(output) -> List[ChartInfo]:
-    """Generate all visualization charts for simulation output."""
+def _generate_all_charts(output, run_id: str) -> List[ChartInfo]:
+    """Generate essential visualization charts for simulation output."""
     
-    from ai_model.visualization.path_plotter import (
-        plot_income_paths,
-        plot_income_distribution,
-        plot_net_cash_flow,
-    )
-    from ai_model.visualization.risk_charts import (
-        plot_default_timing_analysis, plot_risk_summary_card
-    )
-    from ai_model.visualization.portfolio_charts import (
-        plot_portfolio_evolution,
-        plot_income_evolution,
-    )
-    from ai_model.visualization.event_timeline import (
-        plot_event_timeline,
-        plot_event_impact_summary,
-    )
-    from monte_carlo_sim.src.types import LoanConfig
+    from ai_model.visualization.path_plotter import plot_income_paths
+    from ai_model.visualization.risk_charts import plot_default_timing_analysis
+    from ai_model.visualization.portfolio_charts import plot_income_evolution
+    from ai_model.visualization.event_timeline import plot_event_timeline
+    from ai_model.visualization.advanced_charts import plot_risk_surface_3d
     
     charts = []
     
@@ -372,14 +359,8 @@ def _generate_all_charts(output) -> List[ChartInfo]:
     result = output.result
     trajectory = output.trajectory
     
-    loan_config = LoanConfig(
-        amount=result.recommended_loan.optimal_amount,
-        term_months=result.recommended_loan.optimal_term_months,
-        annual_rate=result.recommended_loan.optimal_rate
-    )
-    
     try:
-        path = plot_income_paths(result, arch)
+        path = plot_income_paths(result, arch, run_id=run_id)
         charts.append(ChartInfo(
             type="income_paths",
             path=f"/charts/{path.name}",
@@ -389,27 +370,7 @@ def _generate_all_charts(output) -> List[ChartInfo]:
         print(f"Warning: Failed to generate income_paths chart: {e}")
     
     try:
-        path = plot_risk_summary_card(result, arch, loan_config)
-        charts.append(ChartInfo(
-            type="risk_summary",
-            path=f"/charts/{path.name}",
-            description="Risk assessment summary card"
-        ))
-    except Exception as e:
-        print(f"Warning: Failed to generate risk_summary chart: {e}")
-    
-    try:
-        path = plot_portfolio_evolution(trajectory)
-        charts.append(ChartInfo(
-            type="portfolio_evolution",
-            path=f"/charts/{path.name}",
-            description="Platform and skill growth over time"
-        ))
-    except Exception as e:
-        print(f"Warning: Failed to generate portfolio_evolution chart: {e}")
-    
-    try:
-        path = plot_event_timeline(trajectory)
+        path = plot_event_timeline(trajectory, run_id=run_id)
         charts.append(ChartInfo(
             type="event_timeline",
             path=f"/charts/{path.name}",
@@ -419,7 +380,7 @@ def _generate_all_charts(output) -> List[ChartInfo]:
         print(f"Warning: Failed to generate event_timeline chart: {e}")
     
     try:
-        path = plot_default_timing_analysis(result, arch)
+        path = plot_default_timing_analysis(result, arch, run_id=run_id)
         charts.append(ChartInfo(
             type="default_timing",
             path=f"/charts/{path.name}",
@@ -429,27 +390,7 @@ def _generate_all_charts(output) -> List[ChartInfo]:
         print(f"Warning: Failed to generate default_timing chart: {e}")
 
     try:
-        path = plot_income_distribution(result, arch)
-        charts.append(ChartInfo(
-            type="income_distribution",
-            path=f"/charts/{path.name}",
-            description="Income distribution at month 0"
-        ))
-    except Exception as e:
-        print(f"Warning: Failed to generate income_distribution chart: {e}")
-
-    try:
-        path = plot_net_cash_flow(result, arch, loan_config)
-        charts.append(ChartInfo(
-            type="net_cash_flow",
-            path=f"/charts/{path.name}",
-            description="Net cash flow after expenses and loan payment"
-        ))
-    except Exception as e:
-        print(f"Warning: Failed to generate net_cash_flow chart: {e}")
-
-    try:
-        path = plot_income_evolution(trajectory)
+        path = plot_income_evolution(trajectory, run_id=run_id)
         charts.append(ChartInfo(
             type="income_evolution",
             path=f"/charts/{path.name}",
@@ -457,16 +398,34 @@ def _generate_all_charts(output) -> List[ChartInfo]:
         ))
     except Exception as e:
         print(f"Warning: Failed to generate income_evolution chart: {e}")
-
+    
     try:
-        path = plot_event_impact_summary(trajectory)
+        # Build customer app data object for 3D chart
+        from dataclasses import dataclass
+        from typing import Tuple, List
+        
+        @dataclass
+        class CustomerAppProxy:
+            loan_request_amount: float
+            requested_term_months: int
+            monthly_fixed_expenses: float
+            existing_debt_obligations: float
+        
+        customer_app_proxy = CustomerAppProxy(
+            loan_request_amount=result.recommended_loan.optimal_amount,
+            requested_term_months=result.recommended_loan.optimal_term_months,
+            monthly_fixed_expenses=arch["base_mu"] * 0.45,
+            existing_debt_obligations=arch["base_mu"] * arch["debt_to_income_ratio"]
+        )
+        
+        path = plot_risk_surface_3d(result, customer_app_proxy, arch["id"], run_id=run_id)
         charts.append(ChartInfo(
-            type="event_impact_summary",
+            type="risk_surface_3d",
             path=f"/charts/{path.name}",
-            description="Summary of life event impacts by category"
+            description="3D default risk surface across loan amounts and terms"
         ))
     except Exception as e:
-        print(f"Warning: Failed to generate event_impact_summary chart: {e}")
+        print(f"Warning: Failed to generate risk_surface_3d chart: {e}")
     
     return charts
 

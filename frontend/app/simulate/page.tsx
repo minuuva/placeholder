@@ -61,15 +61,15 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
     return "**Unexpected response** from AI layer.";
   }
   const lines = [
-    "## Simulation complete",
+    "## Risk Assessment Summary",
     "",
-    data.quick_summary || data.summary?.slice(0, 800) || "",
+    data.summary || data.quick_summary || "",
     "",
+    "### Key Metrics",
     `**Default probability:** ${(data.metrics.p_default * 100).toFixed(1)}%`,
     `**Expected loss:** $${formatNumber(Math.round(data.metrics.expected_loss))}`,
     `**CVaR (95%):** $${formatNumber(Math.round(data.metrics.cvar_95))}`,
     `**Risk tier:** ${data.metrics.risk_tier}`,
-    `**Approved:** ${data.metrics.approved ? "yes" : "no"}`,
   ];
   return lines.filter(Boolean).join("\n");
 }
@@ -817,6 +817,7 @@ Next: use the input below to describe optional macro or life events and layer st
         }
 
         if (interpretation.should_run_simulation && interpretation.scenario) {
+          console.log('[DEBUG Frontend] Scenario to send:', JSON.stringify(interpretation.scenario, null, 2));
           setMessages((prev) =>
             prev.map((m) =>
               m.id === loadingMessageId

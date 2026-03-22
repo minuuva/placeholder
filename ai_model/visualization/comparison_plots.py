@@ -56,7 +56,9 @@ def plot_comparison(
         ax.plot(result.median_income_by_month, 'r-', linewidth=2.5, label='Median')
         ax.plot(result.p10_income_by_month, 'orange', linewidth=2,
                linestyle='--', label='P10')
-        ax.axhline(y=archetype["base_mu"], color='black', linestyle=':',
+        # Use actual mean from simulation (accounting for life events)
+        actual_mean = float(np.mean(result.raw_paths[:, 0]))
+        ax.axhline(y=actual_mean, color='black', linestyle=':',
                   linewidth=1.5, label='Base μ', alpha=0.7)
         ax.set_title(f'{name}\nIncome Paths', fontsize=12, fontweight='bold')
         ax.set_xlabel('Month')
@@ -149,14 +151,12 @@ def _generate_comparison_text(output_a, output_b) -> str:
     lines.append(f"SCENARIO A: {output_a.archetype_used['name']}")
     lines.append(f"  P(default): {output_a.result.p_default:.2%}")
     lines.append(f"  Risk Tier: {output_a.result.recommended_loan.risk_tier.value}")
-    lines.append(f"  Approved: {output_a.result.recommended_loan.approved}")
     lines.append(f"  Platforms: {len(output_a.trajectory.portfolio_states[0].active_platforms)}")
     lines.append(f"  Events: {len(output_a.trajectory.events)}")
     lines.append("")
     lines.append(f"SCENARIO B: {output_b.archetype_used['name']}")
     lines.append(f"  P(default): {output_b.result.p_default:.2%}")
     lines.append(f"  Risk Tier: {output_b.result.recommended_loan.risk_tier.value}")
-    lines.append(f"  Approved: {output_b.result.recommended_loan.approved}")
     lines.append(f"  Platforms: {len(output_b.trajectory.portfolio_states[0].active_platforms)}")
     lines.append(f"  Events: {len(output_b.trajectory.events)}")
     lines.append("")

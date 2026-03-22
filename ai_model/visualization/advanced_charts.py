@@ -18,6 +18,7 @@ def plot_risk_surface_3d(
     result,
     customer_app,
     archetype_id: str,
+    run_id: str = None,
     output_path: Optional[Path] = None,
     loan_amounts: Optional[List[float]] = None,
     loan_terms: Optional[List[int]] = None
@@ -29,6 +30,7 @@ def plot_risk_surface_3d(
         result: SimulationResult from base case
         customer_app: CustomerApplication
         archetype_id: Profile identifier
+        run_id: Unique identifier for this simulation run
         output_path: Where to save
         loan_amounts: Range of loan amounts to test
         loan_terms: Range of terms to test
@@ -38,7 +40,10 @@ def plot_risk_surface_3d(
     """
     if output_path is None:
         from ..config import Config
-        output_path = Config.CHART_DIR / f"risk_surface_3d_{archetype_id}.png"
+        if run_id:
+            output_path = Config.CHART_DIR / f"risk_surface_3d_{archetype_id}_{run_id}.png"
+        else:
+            output_path = Config.CHART_DIR / f"risk_surface_3d_{archetype_id}.png"
     
     # Create grid of loan amounts and terms
     if loan_amounts is None:

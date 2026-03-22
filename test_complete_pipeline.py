@@ -151,8 +151,7 @@ def run_complete_assessment(
     print("ASSESSMENT RESULTS")
     print("="*100)
     
-    print(f"\nDecision: {'APPROVED' if assessment.approved else 'DECLINED'}")
-    print(f"Risk Tier: {assessment.risk_tier.upper()}")
+    print(f"\nRisk Tier: {assessment.risk_tier.upper()}")
     print(f"Default Risk: {assessment.default_probability:.2%}")
     
     print(f"\nOptimal Loan Structure:")

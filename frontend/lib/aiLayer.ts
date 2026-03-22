@@ -48,7 +48,6 @@ export interface AiLayerSimulateResponse {
     expected_loss: number;
     cvar_95: number;
     risk_tier: string;
-    approved: boolean;
   };
   trajectory_info?: Record<string, unknown>;
   archetype_info?: Record<string, unknown>;

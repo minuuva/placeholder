@@ -103,11 +103,10 @@ class ResultSummarizer:
         prompt_parts.append(f"  Risk Tier: {result.recommended_loan.risk_tier.value.upper()}")
         prompt_parts.append("")
         
-        prompt_parts.append("LOAN RECOMMENDATION:")
-        prompt_parts.append(f"  Decision: {'APPROVED' if result.recommended_loan.approved else 'DECLINED'}")
-        prompt_parts.append(f"  Optimal Amount: ${result.recommended_loan.optimal_amount:,.0f}")
-        prompt_parts.append(f"  Optimal Term: {result.recommended_loan.optimal_term_months} months")
-        prompt_parts.append(f"  Optimal Rate: {result.recommended_loan.optimal_rate:.2%}")
+        prompt_parts.append("LOAN STRUCTURE ANALYZED:")
+        prompt_parts.append(f"  Amount: ${result.recommended_loan.optimal_amount:,.0f}")
+        prompt_parts.append(f"  Term: {result.recommended_loan.optimal_term_months} months")
+        prompt_parts.append(f"  Rate: {result.recommended_loan.optimal_rate:.2%}")
         if result.recommended_loan.reasoning:
             prompt_parts.append("  Reasoning:")
             for reason in result.recommended_loan.reasoning[:3]:
@@ -170,16 +169,11 @@ class ResultSummarizer:
         lines.append(f"RISK ASSESSMENT SUMMARY: {archetype['name']}")
         lines.append("")
         
-        if result.recommended_loan.approved:
-            lines.append(
-                f"This borrower is APPROVED with a {result.p_default:.1%} default probability "
-                f"over {trajectory.months} months. "
-            )
-        else:
-            lines.append(
-                f"This borrower is DECLINED due to high default risk ({result.p_default:.1%}) "
-                f"over {trajectory.months} months. "
-            )
+        tier_label = result.recommended_loan.risk_tier.value.replace('_', ' ').title()
+        lines.append(
+            f"Risk Profile: {tier_label} tier with {result.p_default:.1%} default probability "
+            f"over {trajectory.months} months. "
+        )
         
         lines.append("")
         lines.append("KEY METRICS:")
@@ -209,16 +203,11 @@ class ResultSummarizer:
         
         lines.append("")
         
-        if result.recommended_loan.approved:
-            lines.append(
-                f"RECOMMENDED TERMS: ${result.recommended_loan.optimal_amount:,.0f} "
-                f"over {result.recommended_loan.optimal_term_months} months "
-                f"at {result.recommended_loan.optimal_rate:.1%} APR."
-            )
-        else:
-            lines.append(
-                f"ALTERNATIVE: Consider smaller loan amount or longer term to reduce monthly payment burden."
-            )
+        lines.append(
+            f"ANALYZED STRUCTURE: ${result.recommended_loan.optimal_amount:,.0f} "
+            f"over {result.recommended_loan.optimal_term_months} months "
+            f"at {result.recommended_loan.optimal_rate:.1%} APR."
+        )
         
         return '\n'.join(lines)
     
@@ -276,7 +265,7 @@ class ResultSummarizer:
         lines.append(f"{desc_a}:")
         lines.append(f"  P(default): {output_a.result.p_default:.2%}")
         lines.append(f"  Expected Loss: ${output_a.result.expected_loss:,.2f}")
-        lines.append(f"  Approved: {output_a.result.recommended_loan.approved}")
+        lines.append(f"  Risk Tier: {output_a.result.recommended_loan.risk_tier.value}")
         lines.append(f"  Platforms: {len(output_a.trajectory.portfolio_states[0].active_platforms)} -> {len(output_a.trajectory.portfolio_states[-1].active_platforms)}")
         lines.append(f"  Events: {len(output_a.trajectory.events)}")
         lines.append("")
@@ -284,7 +273,7 @@ class ResultSummarizer:
         lines.append(f"{desc_b}:")
         lines.append(f"  P(default): {output_b.result.p_default:.2%}")
         lines.append(f"  Expected Loss: ${output_b.result.expected_loss:,.2f}")
-        lines.append(f"  Approved: {output_b.result.recommended_loan.approved}")
+        lines.append(f"  Risk Tier: {output_b.result.recommended_loan.risk_tier.value}")
         lines.append(f"  Platforms: {len(output_b.trajectory.portfolio_states[0].active_platforms)} -> {len(output_b.trajectory.portfolio_states[-1].active_platforms)}")
         lines.append(f"  Events: {len(output_b.trajectory.events)}")
         lines.append("")
@@ -325,10 +314,10 @@ class ResultSummarizer:
         
         lines.append("")
         
-        if output_a.result.recommended_loan.approved and not output_b.result.recommended_loan.approved:
-            lines.append(f"{desc_a} receives loan approval while {desc_b} is declined.")
-        elif output_b.result.recommended_loan.approved and not output_a.result.recommended_loan.approved:
-            lines.append(f"{desc_b} receives loan approval while {desc_a} is declined.")
+        tier_a = output_a.result.recommended_loan.risk_tier.value.replace('_', ' ').title()
+        tier_b = output_b.result.recommended_loan.risk_tier.value.replace('_', ' ').title()
+        if tier_a != tier_b:
+            lines.append(f"Risk tier difference: {desc_a} is {tier_a}, {desc_b} is {tier_b}.")
         
         return '\n'.join(lines)
     
@@ -346,24 +335,23 @@ class ResultSummarizer:
         trajectory = output.trajectory
         archetype = output.archetype_used
         
-        approval = "APPROVED" if result.recommended_loan.approved else "DECLINED"
+        tier_label = result.recommended_loan.risk_tier.value.replace('_', ' ').title()
         
         summary = (
-            f"{archetype['name']}: {approval} with {result.p_default:.1%} default probability "
+            f"{archetype['name']}: {tier_label} tier with {result.p_default:.1%} default probability "
             f"over {trajectory.months} months. "
-            f"Risk tier: {result.recommended_loan.risk_tier.value}. "
         )
         
-        if result.recommended_loan.approved:
+        summary += (
+            f"Analyzed structure: ${result.recommended_loan.optimal_amount:,.0f} "
+            f"for {result.recommended_loan.optimal_term_months} months "
+            f"at {result.recommended_loan.optimal_rate:.1%}. "
+        )
+        
+        if archetype['coefficient_of_variation'] > 0.30:
             summary += (
-                f"Optimal structure: ${result.recommended_loan.optimal_amount:,.0f} "
-                f"for {result.recommended_loan.optimal_term_months} months "
-                f"at {result.recommended_loan.optimal_rate:.1%}."
-            )
-        else:
-            summary += (
-                f"Key concerns: high volatility (CV={archetype['coefficient_of_variation']:.0%}), "
-                f"limited buffer ({archetype['emergency_fund_weeks']} weeks emergency fund)."
+                f"Key considerations: high income volatility (CV={archetype['coefficient_of_variation']:.0%}), "
+                f"{archetype['emergency_fund_weeks']} weeks emergency buffer."
             )
         
         return summary

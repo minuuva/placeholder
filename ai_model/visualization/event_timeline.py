@@ -15,6 +15,7 @@ from collections import defaultdict
 
 def plot_event_timeline(
     trajectory,
+    run_id: str = None,
     output_path: Optional[Path] = None,
     title: Optional[str] = None
 ) -> Path:
@@ -23,6 +24,7 @@ def plot_event_timeline(
     
     Args:
         trajectory: LifeTrajectory object
+        run_id: Unique identifier for this simulation run
         output_path: Where to save chart
         title: Custom title
     
@@ -31,7 +33,10 @@ def plot_event_timeline(
     """
     if output_path is None:
         from ..config import Config
-        output_path = Config.CHART_DIR / f"event_timeline_{trajectory.archetype_id}.png"
+        if run_id:
+            output_path = Config.CHART_DIR / f"event_timeline_{trajectory.archetype_id}_{run_id}.png"
+        else:
+            output_path = Config.CHART_DIR / f"event_timeline_{trajectory.archetype_id}.png"
     
     if not trajectory.events:
         fig, ax = plt.subplots(figsize=(14, 6))

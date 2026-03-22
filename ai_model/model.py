@@ -51,22 +51,21 @@ from data_pipeline.loaders import DataLoader
 @dataclass
 class BankRiskAssessment:
     """Complete risk assessment output for bank decision-making."""
-    
-    # Loan recommendation
-    approved: bool
+
+    # Risk assessment
     risk_tier: str
     optimal_loan_amount: float
     optimal_loan_term: int
     optimal_loan_rate: float
-    
+
     # Risk metrics
     default_probability: float
     expected_loss: float
     cvar_95: float
-    
+
     # AI summary (1-2 paragraphs)
     executive_summary: str
-    
+
     # Chart paths for bank dashboard
     charts: List[Dict[str, str]]
     
@@ -276,7 +275,6 @@ class VarLendModel:
                     "expected_loss": float(result.expected_loss),
                     "median_income_first_6mo": [float(result.median_income_by_month[i]) for i in range(min(6, len(result.median_income_by_month)))],
                     "p10_income_first_6mo": [float(result.p10_income_by_month[i]) for i in range(min(6, len(result.p10_income_by_month)))],
-                    "approved": result.recommended_loan.approved,
                     "risk_tier": result.recommended_loan.risk_tier.value
                 },
                 "timestamp": int(__import__('time').time() * 1000),
@@ -287,7 +285,6 @@ class VarLendModel:
         print(f"  [OK] Simulation completed")
         print(f"  [OK] Default probability: {result.p_default:.2%}")
         print(f"  [OK] Risk tier: {result.recommended_loan.risk_tier.value.upper()}")
-        print(f"  [OK] Decision: {'APPROVED' if result.recommended_loan.approved else 'DECLINED'}")
         
         # STEP 4: Generate 9 risk profile graphs
         print("\n[4/6] Generating risk profile charts...")
@@ -334,7 +331,6 @@ class VarLendModel:
         execution_time = time.time() - start_time
         
         assessment = BankRiskAssessment(
-            approved=result.recommended_loan.approved,
             risk_tier=result.recommended_loan.risk_tier.value,
             optimal_loan_amount=float(result.recommended_loan.optimal_amount),
             optimal_loan_term=int(result.recommended_loan.optimal_term_months),
@@ -777,7 +773,6 @@ class VarLendModel:
         
         return {
             "loan_recommendation": {
-                "approved": result.recommended_loan.approved,
                 "risk_tier": result.recommended_loan.risk_tier.value,
                 "optimal_amount": float(result.recommended_loan.optimal_amount),
                 "optimal_term_months": int(result.recommended_loan.optimal_term_months),
@@ -874,7 +869,6 @@ class VarLendModel:
         """Build context dictionary for summary generation."""
         
         return {
-            "approved": result.recommended_loan.approved,
             "p_default": result.p_default,
             "expected_loss": result.expected_loss,
             "cvar_95": result.cvar_95,
@@ -901,17 +895,16 @@ class VarLendModel:
 Your summary must be EXACTLY 1-2 paragraphs (max 150 words total).
 
 Structure:
-- Paragraph 1: Decision (approve/decline), default probability, and primary risk driver
-- Paragraph 2: Key recommendation with optimal loan terms OR risk mitigation strategy
+- Paragraph 1: Risk assessment tier, default probability, and primary risk driver
+- Paragraph 2: Key insights about loan structure analyzed OR risk mitigation considerations
 
-Be concise, professional, and actionable. Focus on the "why" behind the decision."""
+Be concise, professional, and actionable. Focus on informational risk assessment, NOT approval decisions. Lasso provides data for bank decision-making."""
 
         user_prompt = f"""
 Loan Application Risk Assessment:
 
-Decision: {'APPROVED' if context['approved'] else 'DECLINED'}
-Default Probability: {context['p_default']:.2%}
 Risk Tier: {context['risk_tier'].upper()}
+Default Probability: {context['p_default']:.2%}
 Expected Loss: ${context['expected_loss']:,.0f}
 
 Borrower Profile:
@@ -971,32 +964,25 @@ Write a 1-2 paragraph executive summary (max 150 words).
         else:
             lines.append("Risk profile is within acceptable parameters. ")
         
-        # Paragraph 2: Recommendation
+        # Paragraph 2: Loan structure insights
         lines.append("\n\n")
         
-        if context["approved"]:
-            lines.append(
-                f"Recommended structure: ${context['optimal_amount']:,.0f} over "
-                f"{context['optimal_term']} months at {context['optimal_rate']:.1%} APR. "
-            )
-            
-            # Add key strength
-            if len(context["platforms"]) >= 3:
-                lines.append("Strong platform diversification reduces income correlation risk. ")
-            elif context["emergency_fund_weeks"] >= 6:
-                lines.append("Robust emergency fund provides cushion for income volatility. ")
-            else:
-                lines.append("Monitor for payment consistency during first 6 months. ")
+        lines.append(
+            f"Analyzed structure: ${context['optimal_amount']:,.0f} over "
+            f"{context['optimal_term']} months at {context['optimal_rate']:.1%} APR. "
+        )
+        
+        # Add key insights
+        if len(context["platforms"]) >= 3:
+            lines.append("Strong platform diversification reduces income correlation risk. ")
+        elif context["emergency_fund_weeks"] >= 6:
+            lines.append("Robust emergency fund provides cushion for income volatility. ")
+        elif context["income_cv"] > 0.35:
+            lines.append("High income volatility warrants monitoring during initial months. ")
+        elif context["emergency_fund_weeks"] < 3:
+            lines.append("Limited emergency buffer increases exposure to income shocks. ")
         else:
-            lines.append(
-                f"Alternative approach: Consider smaller amount (${context['optimal_amount']:,.0f}) "
-                f"with longer term ({context['optimal_term']} months) to reduce payment burden. "
-            )
-            
-            if context["income_cv"] > 0.35:
-                lines.append("Encourage platform diversification to reduce income volatility.")
-            elif context["emergency_fund_weeks"] < 3:
-                lines.append("Recommend building emergency fund before reapplying.")
+            lines.append("Standard risk factors observed across simulation paths. ")
         
         return ''.join(lines).strip()
     
@@ -1007,8 +993,7 @@ Write a 1-2 paragraph executive summary (max 150 words).
         print("BANK RISK ASSESSMENT SUMMARY")
         print("="*80)
         
-        print(f"\nDECISION: {'[APPROVED]' if assessment.approved else '[DECLINED]'}")
-        print(f"Risk Tier: {assessment.risk_tier.upper()}")
+        print(f"\nRISK TIER: {assessment.risk_tier.upper()}")
         
         print("\nKEY METRICS:")
         print(f"  Default Probability: {assessment.default_probability:.2%}")
@@ -1063,7 +1048,7 @@ def assess_loan(
         ...     platforms=["uber", "doordash", "instacart"],
         ...     user_prompt="Experienced driver with 3 platforms, good savings"
         ... )
-        >>> print(f"Decision: {'APPROVED' if assessment.approved else 'DECLINED'}")
+        >>> print(f"Risk Tier: {assessment.risk_tier.upper()}")
         >>> print(f"Default risk: {assessment.default_probability:.1%}")
     """
     model = VarLendModel()
