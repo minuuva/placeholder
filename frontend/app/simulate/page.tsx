@@ -563,11 +563,18 @@ export default function SimulateHub() {
     const successMessage: Message = {
       id: generateId(),
       role: "assistant",
-      content: `## Application Complete
+      content: `## Application Submitted
 
-All required information has been collected. Running Monte Carlo simulation to assess your loan risk profile...`,
+Your loan application has been received. We're now running a comprehensive Monte Carlo simulation with **5,000 scenarios** to assess your risk profile and determine the best loan terms for your situation.
+
+This analysis considers:
+- Your income stability across gig platforms
+- Regional economic factors for your metro area
+- Your financial cushion and expense patterns
+- Historical default probability modeling
+
+Results will appear below in just a moment...`,
       timestamp: new Date(),
-      extractedParams: customerApplication as unknown as Record<string, unknown>,
     };
 
     setMessages((prev) => [...prev, successMessage]);
