@@ -46,38 +46,92 @@ type ApplicantAiBundle = {
 };
 
 /**
- * Convert AI-generated summary text into better-formatted markdown.
- * - Converts "(1) X, (2) Y, (3) Z" inline numbering to bullet lists
- * - Adds line breaks before key section phrases for readability
+ * Convert AI-generated summary text into structured markdown with sections and bullet points.
  */
 function formatSummaryText(text: string): string {
-  let formatted = text;
+  // Split into sentences for processing
+  const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
 
-  // Convert inline numbering patterns to bullet lists
-  // Pattern: "include: (1) X, (2) Y, (3) Z" or "include: (1) X, (2) Y, and (3) Z"
-  const numberedPattern = /:\s*\(1\)\s*([^,(]+)(?:,|\s+and)?\s*\(2\)\s*([^,(]+)(?:,|\s+and)?\s*\(3\)\s*([^.]+)/gi;
-  formatted = formatted.replace(numberedPattern, (_, a, b, c) => {
-    return `:\n\n- ${a.trim()}\n- ${b.trim()}\n- ${c.trim()}`
-  });
+  const sections: { title: string; bullets: string[] }[] = [];
+  let currentSection: { title: string; bullets: string[] } | null = null;
 
-  // Add paragraph breaks before key section phrases
-  const breakPhrases = [
-    'The default probability',
-    'Income analysis reveals',
-    'The simulation identified',
-    'Positive developments',
-    'Key risk drivers',
-    'The combination of',
-    'While the applicant',
-    'The median time-to-default',
+  // Define section triggers and their display titles
+  const sectionTriggers: Array<{ pattern: RegExp; title: string }> = [
+    { pattern: /^This applicant presents/i, title: "Risk Profile Overview" },
+    { pattern: /^The default probability|^A.*default probability/i, title: "Default Risk Analysis" },
+    { pattern: /^Income analysis|^The income range|median monthly earnings/i, title: "Income Analysis" },
+    { pattern: /^The simulation identified|^Month \d+|life events|deactivation/i, title: "Life Events Impact" },
+    { pattern: /^Positive developments|platform diversification|skill growth/i, title: "Positive Factors" },
+    { pattern: /^Key risk drivers|risk drivers include/i, title: "Key Risk Drivers" },
+    { pattern: /^The combination of|unsustainable|payment scenario/i, title: "Risk Assessment" },
+    { pattern: /^While the applicant|emergency fund|buffer/i, title: "Financial Resilience" },
   ];
-  breakPhrases.forEach(phrase => {
-    // Only add break if not already preceded by double newline
-    const regex = new RegExp(`([^\n])\\s*(${phrase})`, 'g');
-    formatted = formatted.replace(regex, '$1\n\n$2');
-  });
 
-  return formatted;
+  for (const sentence of sentences) {
+    const trimmed = sentence.trim();
+    if (!trimmed) continue;
+
+    // Check if this sentence starts a new section
+    let matchedSection: string | null = null;
+    for (const trigger of sectionTriggers) {
+      if (trigger.pattern.test(trimmed)) {
+        matchedSection = trigger.title;
+        break;
+      }
+    }
+
+    if (matchedSection) {
+      // Check if we already have a section with this title
+      const existingSection = sections.find(s => s.title === matchedSection);
+      if (existingSection) {
+        currentSection = existingSection;
+      } else {
+        currentSection = { title: matchedSection, bullets: [] };
+        sections.push(currentSection);
+      }
+    }
+
+    // If no current section, create a general one
+    if (!currentSection) {
+      currentSection = { title: "Summary", bullets: [] };
+      sections.push(currentSection);
+    }
+
+    // Convert inline numbering to separate bullets
+    const numberedMatch = trimmed.match(/:\s*\(1\)\s*([^,]+),?\s*\(2\)\s*([^,]+),?\s*(?:and\s*)?\(3\)\s*([^.]+)/i);
+    if (numberedMatch) {
+      const prefix = trimmed.split(/:\s*\(1\)/)[0];
+      if (prefix) currentSection.bullets.push(prefix + ":");
+      currentSection.bullets.push(numberedMatch[1].trim());
+      currentSection.bullets.push(numberedMatch[2].trim());
+      currentSection.bullets.push(numberedMatch[3].trim());
+    } else {
+      currentSection.bullets.push(trimmed);
+    }
+  }
+
+  // Build markdown output
+  const output: string[] = [];
+
+  for (const section of sections) {
+    if (section.bullets.length === 0) continue;
+
+    output.push(`**${section.title}**`);
+    output.push("");
+
+    for (const bullet of section.bullets) {
+      // Clean up the bullet text
+      let cleanBullet = bullet.trim();
+      // Remove trailing period for cleaner bullets, unless it ends with a number
+      if (cleanBullet.endsWith('.') && !/\d\.$/.test(cleanBullet)) {
+        cleanBullet = cleanBullet.slice(0, -1);
+      }
+      output.push(`- ${cleanBullet}`);
+    }
+    output.push("");
+  }
+
+  return output.join("\n");
 }
 
 function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean): string {
