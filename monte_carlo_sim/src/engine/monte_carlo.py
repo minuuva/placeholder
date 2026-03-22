@@ -14,6 +14,7 @@ from src.engine.income_model import draw_monthly_income
 from src.engine.parameter_state import effective_parameters, macro_scaling
 from src.engine.seasonality import get_multipliers
 from src.engine.defaults import detect_defaults_and_losses
+from src.engine.path_events import sample_life_events_vectorized, sample_macro_shocks_vectorized
 from src.risk import loan_evaluator, risk_metrics
 from src.types import (
     AIScenario,
@@ -89,6 +90,7 @@ def run_simulation(
     load: LoadResult,
     scenario: AIScenario | None = None,
     refine_alternatives: bool = True,
+    archetype_data: dict | None = None,
 ) -> SimulationResult:
     """
     Run the full vectorized Monte Carlo pipeline for one loan configuration.
@@ -104,9 +106,11 @@ def run_simulation(
     load:
         Derived fields from the JSON loader (obligations, portfolio mu/sigma, jump overrides).
     scenario:
-        Optional AI scenario with deterministic shifts and discrete jumps.
+        Optional AI scenario with deterministic shifts and discrete jumps (DEPRECATED - use archetype_data for per-path events).
     refine_alternatives:
         When ``False``, skip DECLINE restructuring search (avoids nested recursion).
+    archetype_data:
+        Archetype configuration for per-path life event sampling. If provided, enables path-independent event sampling.
 
     Returns
     -------
@@ -142,10 +146,24 @@ def run_simulation(
     dgig = _dominant_gig_type(profile)
 
     income = np.zeros((n_paths, h), dtype=np.float64)
+    expenses = np.zeros((n_paths, h), dtype=np.float64)  # Now per-path
     poisson_echo = np.zeros(n_paths, dtype=np.float64)
     disc_echo_carry = np.zeros(n_paths, dtype=np.float64)
     disc_echo_end = -1
     disc_decay = 1.0
+    
+    # Initialize per-path event tracking
+    use_path_events = archetype_data is not None
+    path_active_shocks = np.zeros(n_paths, dtype=np.int32)
+    path_shock_end_months = np.full(n_paths, -1, dtype=np.int32)
+    
+    # Load event data if using path events
+    expense_data = None
+    macro_data = None
+    if use_path_events:
+        if _data_loader is not None:
+            expense_data = _data_loader.get_expense_data()
+            macro_data = _data_loader._load_json("macro_params.json")
 
     for t in range(h):
         if disc_echo_end < 0 or t > disc_echo_end:
@@ -160,7 +178,29 @@ def run_simulation(
         mu_t = np.full(n_paths, mu_b * smu, dtype=np.float64)
         sigma_t = np.full(n_paths, max(sig_b * ssig, 1e-6), dtype=np.float64)
         lambda_t = np.full(n_paths, min(max(lam_b, 0.0), 1.0), dtype=np.float64)
-
+        expenses_t = np.full(n_paths, exp_b, dtype=np.float64)
+        
+        # Sample per-path life events if archetype_data provided
+        if use_path_events and expense_data and macro_data:
+            # Sample life events
+            income_adj, expense_adj, volatility_mult = sample_life_events_vectorized(
+                n_paths, t, archetype_data, expense_data, rng
+            )
+            
+            # Sample macro shocks
+            mu_mult, sigma_mult, exp_mult, path_active_shocks, path_shock_end_months = sample_macro_shocks_vectorized(
+                n_paths, t, path_active_shocks, path_shock_end_months, macro_data, rng
+            )
+            
+            # Apply adjustments
+            mu_t += income_adj
+            mu_t *= mu_mult
+            sigma_t *= volatility_mult * sigma_mult
+            sigma_t = np.maximum(sigma_t, 1e-6)  # Ensure positive
+            expenses_t += expense_adj
+            expenses_t *= exp_mult
+        
+        # Apply scenario-based discrete jumps (legacy support)
         djumps = [j for j in (scenario.discrete_jumps if scenario else []) if j.month == t]
         d_amt = float(sum(j.amount for j in djumps))
         d_var = float(sum(j.variance for j in djumps))
@@ -179,6 +219,7 @@ def run_simulation(
             jump_echo_decay=1.0,
         )
         income[:, t] = inc_col
+        expenses[:, t] = expenses_t
 
         echo_candidates = [j for j in djumps if j.echo_months is not None and j.echo_months > 0]
         if echo_candidates:
@@ -186,11 +227,6 @@ def run_simulation(
             disc_echo_end = max(disc_echo_end, t + int(jm.echo_months))
             disc_decay = float(jm.echo_decay_rate) if jm.echo_decay_rate is not None else 0.7
             disc_echo_carry = disc_echo_carry + disc_draw * disc_decay
-
-    expenses = np.array(
-        [effective_parameters(t, mu_base0, sigma_base0, lambda_base0, obligations0, shifts)[3] for t in range(h)],
-        dtype=np.float64,
-    )
 
     pmt = _monthly_payment(loan.amount, loan.annual_rate, loan.term_months)
     defaulted, default_month, losses = detect_defaults_and_losses(

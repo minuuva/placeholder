@@ -107,7 +107,8 @@ def detect_defaults_and_losses(
     income_matrix:
         Shape (n_paths, horizon_months), gross income paths.
     expenses_by_month:
-        Shape (horizon_months,), nonnegative expenses per month (same across paths).
+        Shape (horizon_months,) OR (n_paths, horizon_months), expenses per month.
+        If 1D, expenses are the same across paths. If 2D, expenses are per-path.
     monthly_payment:
         Loan payment (scalar).
     initial_buffer:
@@ -133,7 +134,15 @@ def detect_defaults_and_losses(
     n_paths, h = income_matrix.shape
     exp = np.asarray(expenses_by_month, dtype=np.float64)
     pay = np.broadcast_to(monthly_payment, (n_paths, h))
-    exp_b = np.broadcast_to(exp, (n_paths, h))
+    
+    # Handle both 1D (same for all paths) and 2D (per-path) expenses
+    if exp.ndim == 1:
+        # Legacy: broadcast 1D expenses to all paths
+        exp_b = np.broadcast_to(exp, (n_paths, h))
+    else:
+        # New: per-path expenses
+        exp_b = exp
+    
     net = income_matrix - exp_b - pay
 
     cs = np.cumsum(net, axis=1)

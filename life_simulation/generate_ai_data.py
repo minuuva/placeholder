@@ -3,29 +3,21 @@ Generate AI Layer Input Data
 
 This script runs the complete VarLend risk assessment pipeline:
 - Layer 1: Monte Carlo simulation (5000 paths, 24 months)
-- Layer 2: Life simulation (events, portfolio evolution, macro shocks)
+- Layer 2: Per-path life event sampling (each path independently samples events)
 
-Output: trajectory + result objects needed for AI Layer visualization
+Each of the 5000 Monte Carlo paths independently samples its own:
+- Life events (vehicle repairs, health issues, platform deactivations, housing)
+- Macro shocks (recession, gas spike, regulatory changes, tech disruption)
 
-Configuration:
-- n_trajectories=1: Deterministic (all paths use same life story) - legacy behavior
-- n_trajectories=100: Probabilistic (realistic event distribution) - RECOMMENDED
+This provides true probabilistic risk distributions.
 """
 
 from run_life_simulation import run_full_life_simulation
 from monte_carlo_sim.src.integration.profile_builder import CustomerApplication
 from monte_carlo_sim.src.types import LoanConfig
 
-# CONFIGURATION: Set number of independent life trajectories
-# - 1 = deterministic (test single scenario)
-# - 100 = probabilistic (realistic risk distribution)
-#
-# NOTE: With N_TRAJECTORIES=100, the system generates 100 independent
-# life stories (each with different events/shocks) and aggregates the
-# results. This produces realistic probability distributions instead of
-# a single deterministic outcome.
-N_TRAJECTORIES = 100
-N_PATHS = 5000
+# Configuration
+N_PATHS = 5000  # Each path independently samples its own events
 
 # Example customer application
 customer = CustomerApplication(
@@ -34,13 +26,13 @@ customer = CustomerApplication(
         ('doordash', 20.0, 6)
     ],
     metro_area='national',
-    months_as_gig_worker=12,
+    months_as_gig_worker=18,
     has_vehicle=True,
     has_dependents=False,
     liquid_savings=2000,
-    monthly_fixed_expenses=1400,  # Rent + other fixed costs
+    monthly_fixed_expenses=300,  # Rent + other fixed costs
     existing_debt_obligations=200,
-    credit_score_range=(600, 650),
+    credit_score_range=(600, 800),
     loan_request_amount=5000,
     requested_term_months=24,
     acceptable_rate_range=(0.08, 0.20)
@@ -49,22 +41,19 @@ customer = CustomerApplication(
 # Requested loan
 loan = LoanConfig(amount=5000, term_months=24, annual_rate=0.12)
 
-print("Running full life simulation (Layer 1 + Layer 2)...")
+print("Running full life simulation with per-path event sampling...")
 print("Archetype: volatile_vic")
-print(f"Mode: {'PROBABILISTIC' if N_TRAJECTORIES > 1 else 'DETERMINISTIC'}")
-print(f"Trajectories: {N_TRAJECTORIES}")
-print(f"Paths per trajectory: {N_PATHS // N_TRAJECTORIES if N_TRAJECTORIES > 1 else N_PATHS}")
-print(f"Total Monte Carlo paths: {N_PATHS}")
+print(f"Monte Carlo paths: {N_PATHS}")
+print("Each path independently samples its own life events and macro shocks")
 print("Horizon: 24 months\n")
 
-# THIS IS THE KEY FUNCTION - runs entire pipeline
-trajectory, result = run_full_life_simulation(
+# THIS IS THE KEY FUNCTION - runs entire pipeline with per-path events
+result = run_full_life_simulation(
     archetype_id='volatile_vic',
     customer_application=customer,
     loan_config=loan,
-    random_seed=None,  # Use None for true randomness across trajectories
-    n_paths=N_PATHS,
-    n_trajectories=N_TRAJECTORIES
+    random_seed=None,  # Use None for true randomness
+    n_paths=N_PATHS
 )
 
 print("="*60)
@@ -91,17 +80,6 @@ print("\n--- ALTERNATIVE STRUCTURES ---")
 for alt in result.recommended_loan.alternative_structures[:3]:
     print(f"  ${alt['amount']:.0f} / {alt['term']}mo / {alt['annual_rate']:.1%} → P(default)={alt['p_default']:.1%}")
 
-print("\n--- LIFE TRAJECTORY ---")
-print(f"Events: {len(trajectory.events)}")
-print(f"Macro shock: {trajectory.macro_shock is not None}")
-if trajectory.macro_shock:
-    print(f"  {trajectory.macro_shock}")
-print(f"Portfolio growth: {len(trajectory.portfolio_states[0].active_platforms)} → {len(trajectory.portfolio_states[-1].active_platforms)} platforms")
-print(f"Skill growth: {trajectory.portfolio_states[0].skill_multiplier:.2f}x → {trajectory.portfolio_states[-1].skill_multiplier:.2f}x")
-
-print("\n--- NARRATIVE ---")
-print(trajectory.narrative)
-
 print("\n--- TIME-TO-DEFAULT PERCENTILES ---")
 for percentile, month in result.time_to_default_percentiles.items():
     print(f"  {percentile}: month {month}")
@@ -113,15 +91,9 @@ for i in range(6):
     print(f"{i:5d} | ${result.p10_income_by_month[i]:7.0f} | ${result.median_income_by_month[i]:7.0f} | ${result.p90_income_by_month[i]:7.0f}")
 
 print("\n" + "="*60)
-print("DATA OBJECTS FOR AI LAYER:")
+print("DATA OBJECT FOR AI LAYER:")
 print("="*60)
-print("\n1. 'trajectory' object contains:")
-print("   - trajectory.events (life events list)")
-print("   - trajectory.portfolio_states (month-by-month)")
-print("   - trajectory.macro_shock (macro context)")
-print("   - trajectory.narrative (human-readable story)")
-
-print("\n2. 'result' object contains:")
+print("\n'result' object contains:")
 print("   - result.p_default (risk metric)")
 print("   - result.expected_loss (dollar loss)")
 print("   - result.cvar_95 (worst-case loss)")
@@ -132,5 +104,5 @@ print("   - result.p10_income_by_month (worst 10% income path)")
 print("   - result.p90_income_by_month (best 10% income path)")
 print("   - result.raw_paths (5000 full Monte Carlo paths)")
 
-print("\nAI Layer should use BOTH objects to generate visual risk profile.")
+print("\nEach of the 5000 paths had independent life events and macro shocks.")
 print("="*60)
