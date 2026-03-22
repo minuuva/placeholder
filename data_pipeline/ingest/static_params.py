@@ -54,6 +54,18 @@ PLATFORM_EARNINGS = {
         "full_time_weekly": (550, 1100),
         "variance_multiplier": 1.12,
     },
+    "ubereats": {
+        "hourly_rate": 19.00,  # Industry estimates, slightly higher than DoorDash
+        "part_time_weekly": (160, 420),
+        "full_time_weekly": (620, 1250),
+        "variance_multiplier": 1.15,  # Similar to delivery platforms
+    },
+    "uber_eats": {
+        "hourly_rate": 19.00,  # Alias for ubereats
+        "part_time_weekly": (160, 420),
+        "full_time_weekly": (620, 1250),
+        "variance_multiplier": 1.15,
+    },
 }
 
 # Expense structure (from Triplog, industry data)
@@ -200,7 +212,7 @@ DEFAULT_PARAMETERS = {
 
 def get_platform_gig_type(platform):
     """Map platform to gig type for seasonality lookup."""
-    delivery_platforms = ["doordash", "grubhub", "instacart", "ubereats"]
+    delivery_platforms = ["doordash", "grubhub", "instacart", "ubereats", "uber_eats"]
     rideshare_platforms = ["uber", "lyft"]
     
     if platform in delivery_platforms:
