@@ -76,7 +76,6 @@ class WorkerProfile:
     liquid_savings: float
     monthly_fixed_expenses: float
     existing_debt_obligations: float
-    credit_score_range: tuple[int, int]
     loan_request_amount: float
     requested_term_months: int
     acceptable_rate_range: tuple[float, float]
@@ -158,6 +157,12 @@ class SimulationResult:
     time_to_default_percentiles: dict[str, float]
     recommended_loan: LoanRecommendation
     raw_paths: np.ndarray
+    defaulted: np.ndarray
+    default_month: np.ndarray
+    losses: np.ndarray
+    monthly_net_cash_flows: np.ndarray
+    monthly_buffer: np.ndarray
+    monthly_expenses: np.ndarray
 
 
 @dataclass(frozen=True)

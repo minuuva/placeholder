@@ -239,6 +239,18 @@ def run_simulation(
         loan.term_months,
     )
 
+    # Compute cash flows and buffers for granular plotting
+    n_paths, h = income.shape
+    payment_matrix = np.full((n_paths, h), pmt, dtype=np.float64)
+    cash_flows = income - expenses - payment_matrix
+    
+    # Compute buffer trajectory (same logic as in defaults.py)
+    buffers = np.zeros((n_paths, h), dtype=np.float64)
+    buffer_state = np.full(n_paths, profile.liquid_savings, dtype=np.float64)
+    for t in range(h):
+        buffer_state = np.maximum(buffer_state + cash_flows[:, t], 0.0)
+        buffers[:, t] = buffer_state
+
     p_def = risk_metrics.p_default(defaulted)
     el = risk_metrics.expected_loss(losses)
     cvar95 = risk_metrics.cvar(losses, 0.95)
@@ -267,6 +279,12 @@ def run_simulation(
         time_to_default_percentiles=ttd,
         recommended_loan=placeholder,
         raw_paths=income,
+        defaulted=defaulted,
+        default_month=default_month,
+        losses=losses,
+        monthly_net_cash_flows=cash_flows,
+        monthly_buffer=buffers,
+        monthly_expenses=expenses,
     )
 
     rec = loan_evaluator.evaluate_loan(sim, loan)

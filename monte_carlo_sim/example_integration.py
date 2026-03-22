@@ -61,7 +61,6 @@ def example_loan_application_flow():
         liquid_savings=6800.0,
         monthly_fixed_expenses=1200.0,
         existing_debt_obligations=180.0,
-        credit_score_range=(640, 680),
         loan_request_amount=4500.0,
         requested_term_months=24,
         acceptable_rate_range=(0.10, 0.18),

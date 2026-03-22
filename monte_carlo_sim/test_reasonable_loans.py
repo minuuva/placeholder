@@ -59,7 +59,6 @@ def create_archetype_profile(archetype: dict, loan_amount: float, term: int) -> 
         liquid_savings=liquid_savings,
         monthly_fixed_expenses=monthly_expenses,
         existing_debt_obligations=monthly_debt,
-        credit_score_range=tuple(archetype["credit_score_range"]),
         loan_request_amount=loan_amount,
         requested_term_months=term,
         acceptable_rate_range=(0.08, 0.24),
@@ -103,7 +102,7 @@ def main():
         print(f"\n{archetype['name']}:")
         print(f"  Profile: {description}")
         print(f"  Income: ${archetype['base_mu']:.0f}/mo (CV: {archetype['coefficient_of_variation']:.1%})")
-        print(f"  Emergency: {archetype['emergency_fund_weeks']} weeks | Credit: {archetype['credit_score_range'][0]}-{archetype['credit_score_range'][1]}")
+        print(f"  Emergency: {archetype['emergency_fund_weeks']} weeks")
         print(f"  Loan: ${loan_amt:,} @ {loan.annual_rate:.0%} for {loan_term} months")
         print(f"  Result: P(def)={result.p_default:.2%} | Tier={rec.risk_tier.value.upper()} | Approved={rec.approved}")
         

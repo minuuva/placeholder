@@ -46,7 +46,6 @@ class CustomerApplication:
         liquid_savings: float,
         monthly_fixed_expenses: float,
         existing_debt_obligations: float,
-        credit_score_range: tuple[int, int],
         loan_request_amount: float,
         requested_term_months: int,
         acceptable_rate_range: tuple[float, float],
@@ -73,8 +72,6 @@ class CustomerApplication:
             Rent, utilities, food, etc. (non-gig expenses).
         existing_debt_obligations:
             Monthly payments on other debts (car loan, credit cards, etc.).
-        credit_score_range:
-            (min, max) credit score range.
         loan_request_amount:
             How much they're asking to borrow.
         requested_term_months:
@@ -90,7 +87,6 @@ class CustomerApplication:
         self.liquid_savings = liquid_savings
         self.monthly_fixed_expenses = monthly_fixed_expenses
         self.existing_debt_obligations = existing_debt_obligations
-        self.credit_score_range = credit_score_range
         self.loan_request_amount = loan_request_amount
         self.requested_term_months = requested_term_months
         self.acceptable_rate_range = acceptable_rate_range
@@ -234,7 +230,6 @@ def build_profile_from_application(
         liquid_savings=application.liquid_savings,
         monthly_fixed_expenses=application.monthly_fixed_expenses,
         existing_debt_obligations=application.existing_debt_obligations,
-        credit_score_range=application.credit_score_range,
         loan_request_amount=application.loan_request_amount,
         requested_term_months=application.requested_term_months,
         acceptable_rate_range=application.acceptable_rate_range,

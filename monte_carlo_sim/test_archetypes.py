@@ -67,7 +67,6 @@ def archetype_to_worker_profile(archetype: dict) -> WorkerProfile:
         liquid_savings=liquid_savings,
         monthly_fixed_expenses=monthly_expenses,
         existing_debt_obligations=monthly_debt,
-        credit_score_range=tuple(archetype["credit_score_range"]),
         loan_request_amount=loan_request,
         requested_term_months=archetype["recommended_loan_term_months"],
         acceptable_rate_range=(0.08, 0.24),
@@ -85,7 +84,6 @@ def test_archetype(archetype_id: str, loader: DataLoader):
     print(f"Base Income: ${archetype['base_mu']:.2f}/mo (CV: {archetype['coefficient_of_variation']:.1%})")
     print(f"Platforms: {', '.join(archetype['platforms'])}")
     print(f"Emergency Fund: {archetype['emergency_fund_weeks']} weeks")
-    print(f"Credit Score: {archetype['credit_score_range'][0]}-{archetype['credit_score_range'][1]}")
     print(f"Expected Risk: {archetype['default_risk_category'].upper()}")
     
     profile = archetype_to_worker_profile(archetype)

@@ -71,7 +71,6 @@ def create_volatile_vic():
         # Financial characteristics
         "emergency_fund_weeks": 2,  # Only 2 weeks of savings
         "debt_to_income_ratio": 0.45,  # High debt burden
-        "credit_score_range": (580, 640),  # Fair credit
         
         # Loan considerations
         "default_risk_category": "high",
@@ -131,8 +130,7 @@ def create_steady_sarah():
         
         "emergency_fund_weeks": 8,  # 8 weeks of savings (above JPMorgan's 6 week recommendation)
         "debt_to_income_ratio": 0.30,  # Moderate debt
-        "credit_score_range": (660, 720),  # Good credit
-        
+
         "default_risk_category": "low",
         "recommended_loan_amount_range": (5000, 10000),
         "recommended_loan_term_months": 24,
@@ -189,8 +187,7 @@ def create_weekend_warrior():
         
         "emergency_fund_weeks": 10,  # Better off (has primary job)
         "debt_to_income_ratio": 0.25,  # Low (gig income is extra)
-        "credit_score_range": (680, 740),  # Good to very good credit
-        
+
         "default_risk_category": "low",
         "recommended_loan_amount_range": (1000, 3000),  # Smaller loans
         "recommended_loan_term_months": 12,
@@ -247,8 +244,7 @@ def create_sf_hustler():
         
         "emergency_fund_weeks": 4,  # Only 4 weeks (expenses eat savings)
         "debt_to_income_ratio": 0.40,  # High (cost of living)
-        "credit_score_range": (640, 700),  # Fair to good
-        
+
         "default_risk_category": "medium",
         "recommended_loan_amount_range": (5000, 12000),
         "recommended_loan_term_months": 24,
@@ -305,8 +301,7 @@ def create_rising_ryan():
         
         "emergency_fund_weeks": 3,  # Low (just starting)
         "debt_to_income_ratio": 0.35,  # Moderate
-        "credit_score_range": (620, 680),  # Fair to good
-        
+
         "default_risk_category": "medium",
         "recommended_loan_amount_range": (2000, 6000),
         "recommended_loan_term_months": 18,
@@ -416,7 +411,6 @@ if __name__ == "__main__":
         print(f"\nFinancial Profile:")
         print(f"  Emergency fund: {arch['emergency_fund_weeks']} weeks")
         print(f"  Debt-to-income: {arch['debt_to_income_ratio']:.0%}")
-        print(f"  Credit score: {arch['credit_score_range'][0]}-{arch['credit_score_range'][1]}")
         print(f"  Default risk: {arch['default_risk_category'].upper()}")
         
         print(f"\nLoan Recommendations:")

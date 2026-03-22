@@ -59,7 +59,6 @@ def _demo_profile() -> WorkerProfile:
         liquid_savings=7500.0,
         monthly_fixed_expenses=2100.0,
         existing_debt_obligations=350.0,
-        credit_score_range=(595, 635),
         loan_request_amount=6500.0,
         requested_term_months=36,
         acceptable_rate_range=(0.10, 0.20),

@@ -61,7 +61,6 @@ def create_profile(archetype: dict) -> WorkerProfile:
         liquid_savings=liquid_savings,
         monthly_fixed_expenses=monthly_expenses,
         existing_debt_obligations=monthly_debt,
-        credit_score_range=tuple(archetype["credit_score_range"]),
         loan_request_amount=loan_request,
         requested_term_months=archetype["recommended_loan_term_months"],
         acceptable_rate_range=(0.08, 0.24),
@@ -126,7 +125,6 @@ def main():
     print(f"  CV                             {sarah['archetype']['coefficient_of_variation']:>18.1%}  {warrior['archetype']['coefficient_of_variation']:>18.1%}  {'Sarah' if sarah['archetype']['coefficient_of_variation'] < warrior['archetype']['coefficient_of_variation'] else 'Warrior'}")
     print(f"  # Platforms                    {len(sarah['archetype']['platforms']):>18}  {len(warrior['archetype']['platforms']):>18}  {'Sarah' if len(sarah['archetype']['platforms']) > len(warrior['archetype']['platforms']) else 'Warrior'}")
     print(f"  Emergency Fund (weeks)         {sarah['archetype']['emergency_fund_weeks']:>18}  {warrior['archetype']['emergency_fund_weeks']:>18}  {'Warrior' if warrior['archetype']['emergency_fund_weeks'] > sarah['archetype']['emergency_fund_weeks'] else 'Sarah'}")
-    print(f"  Credit Score (midpoint)        {sum(sarah['archetype']['credit_score_range'])//2:>18}  {sum(warrior['archetype']['credit_score_range'])//2:>18}  {'Warrior' if sum(warrior['archetype']['credit_score_range'])//2 > sum(sarah['archetype']['credit_score_range'])//2 else 'Sarah'}")
     
     print(f"\n{'PROFILE IN SIMULATION':<35}")
     print(f"  Total Income                   ${sarah['total_income']:>17,.2f}  ${warrior['total_income']:>17,.2f}  {'Sarah' if sarah['total_income'] > warrior['total_income'] else 'Warrior'}")
@@ -261,7 +259,6 @@ def main():
     print(f"{'  Coefficient of Variation':<40} {s_arch['coefficient_of_variation']:>18.1%}  {w_arch['coefficient_of_variation']:>18.1%}  {'Sarah (lower)' if s_arch['coefficient_of_variation'] < w_arch['coefficient_of_variation'] else 'Warrior (lower)'}")
     print(f"{'  Number of Platforms':<40} {len(s_arch['platforms']):>18}  {len(w_arch['platforms']):>18}  {'Sarah (diversified)' if len(s_arch['platforms']) > len(w_arch['platforms']) else 'Warrior'}")
     print(f"{'  Emergency Fund (weeks)':<40} {s_arch['emergency_fund_weeks']:>18}  {w_arch['emergency_fund_weeks']:>18}  {'Warrior >' if w_arch['emergency_fund_weeks'] > s_arch['emergency_fund_weeks'] else 'Sarah >'}")
-    print(f"{'  Credit Score (avg)':<40} {sum(s_arch['credit_score_range'])//2:>18}  {sum(w_arch['credit_score_range'])//2:>18}  {'Warrior >' if sum(w_arch['credit_score_range'])//2 > sum(s_arch['credit_score_range'])//2 else 'Sarah >'}")
     
     print(f"\n{'CALCULATED PROFILE VALUES':<40}")
     print(f"{'  Total Income (sim)':<40} ${sarah_data['total_income']:>17,.0f}  ${warrior_data['total_income']:>17,.0f}  {'Sarah >' if sarah_data['total_income'] > warrior_data['total_income'] else 'Warrior >'}")

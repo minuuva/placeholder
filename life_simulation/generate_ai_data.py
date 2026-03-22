@@ -12,9 +12,11 @@ Each of the 5000 Monte Carlo paths independently samples its own:
 This provides true probabilistic risk distributions.
 """
 
+from datetime import datetime
 from run_life_simulation import run_full_life_simulation
 from monte_carlo_sim.src.integration.profile_builder import CustomerApplication
 from monte_carlo_sim.src.types import LoanConfig
+from monte_carlo_sim.src.output import save_result_to_json, get_simulation_results_dir
 
 # Configuration
 N_PATHS = 5000  # Each path independently samples its own events
@@ -32,7 +34,6 @@ customer = CustomerApplication(
     liquid_savings=2000,
     monthly_fixed_expenses=300,  # Rent + other fixed costs
     existing_debt_obligations=200,
-    credit_score_range=(600, 800),
     loan_request_amount=5000,
     requested_term_months=24,
     acceptable_rate_range=(0.08, 0.20)
@@ -55,6 +56,13 @@ result = run_full_life_simulation(
     random_seed=None,  # Use None for true randomness
     n_paths=N_PATHS
 )
+
+# Save result to JSON for AI layer consumption
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+output_dir = get_simulation_results_dir()
+output_path = output_dir / f"test_simulation_{timestamp}.json"
+save_result_to_json(result, output_path, include_raw_paths=False)
+print(f"✓ Saved simulation result to: {output_path}\n")
 
 print("="*60)
 print("RISK ASSESSMENT RESULTS")

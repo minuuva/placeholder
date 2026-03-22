@@ -63,7 +63,6 @@ def create_archetype_profile(archetype: dict, expenses_pct: float = 0.25, debt_p
         liquid_savings=liquid_savings,
         monthly_fixed_expenses=monthly_expenses,
         existing_debt_obligations=monthly_debt,
-        credit_score_range=tuple(archetype["credit_score_range"]),
         loan_request_amount=loan_request,
         requested_term_months=archetype["recommended_loan_term_months"],
         acceptable_rate_range=(0.08, 0.24),
@@ -106,7 +105,6 @@ def visualize_comparison(arch1_id: str, arch2_id: str, loan_amount: float = 2000
     print(f"  CV                           {arch1['coefficient_of_variation']:>18.1%}  {arch2['coefficient_of_variation']:>18.1%}")
     print(f"  Platforms                    {len(arch1['platforms']):>18}  {len(arch2['platforms']):>18}")
     print(f"  Emergency Fund               {arch1['emergency_fund_weeks']:>15} wks  {arch2['emergency_fund_weeks']:>15} wks")
-    print(f"  Credit Score                 {arch1['credit_score_range'][0]:>12}-{arch1['credit_score_range'][1]:<3}  {arch2['credit_score_range'][0]:>12}-{arch2['credit_score_range'][1]:<3}")
     
     total_income1 = sum(s.mean_monthly_income for s in profile1.streams)
     total_income2 = sum(s.mean_monthly_income for s in profile2.streams)
@@ -223,7 +221,6 @@ def detailed_profile_analysis(arch_id: str, loan_amount: float = 2000):
     print(f"  Metro: {archetype['metro']}")
     print(f"  Emergency fund: {archetype['emergency_fund_weeks']} weeks")
     print(f"  Debt-to-income: {archetype['debt_to_income_ratio']:.1%}")
-    print(f"  Credit score: {archetype['credit_score_range']}")
     
     print(f"\nWORKERPROFILE CONSTRUCTED:")
     print(f"  Number of streams: {len(profile.streams)}")

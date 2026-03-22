@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-03-21T14:42:39.193592",
+    "generated_at": "2026-03-22T01:01:55.987619",
     "version": "1.0",
     "description": "Gig worker archetype personas for VarLend risk modeling",
     "source": "JPMorgan Chase Institute + Gridwise + industry research",
@@ -34,10 +34,6 @@
       },
       "emergency_fund_weeks": 2,
       "debt_to_income_ratio": 0.45,
-      "credit_score_range": [
-        580,
-        640
-      ],
       "default_risk_category": "high",
       "recommended_loan_amount_range": [
         2000,
@@ -74,10 +70,6 @@
       },
       "emergency_fund_weeks": 8,
       "debt_to_income_ratio": 0.3,
-      "credit_score_range": [
-        660,
-        720
-      ],
       "default_risk_category": "low",
       "recommended_loan_amount_range": [
         5000,
@@ -112,10 +104,6 @@
       },
       "emergency_fund_weeks": 10,
       "debt_to_income_ratio": 0.25,
-      "credit_score_range": [
-        680,
-        740
-      ],
       "default_risk_category": "low",
       "recommended_loan_amount_range": [
         1000,
@@ -151,10 +139,6 @@
       },
       "emergency_fund_weeks": 4,
       "debt_to_income_ratio": 0.4,
-      "credit_score_range": [
-        640,
-        700
-      ],
       "default_risk_category": "medium",
       "recommended_loan_amount_range": [
         5000,
@@ -190,10 +174,6 @@
       },
       "emergency_fund_weeks": 3,
       "debt_to_income_ratio": 0.35,
-      "credit_score_range": [
-        620,
-        680
-      ],
       "default_risk_category": "medium",
       "recommended_loan_amount_range": [
         2000,
