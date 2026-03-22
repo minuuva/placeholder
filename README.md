@@ -81,7 +81,7 @@ Charts are saved to: `ai_model/outputs/charts/`
 
 ## Requirements
 
-See `requirements.txt` and `monte_carlo_sim/requirements.txt`
+See root `requirements.txt` (covers the full project, including `monte_carlo_sim`).
 
 ## Important Notes
 
