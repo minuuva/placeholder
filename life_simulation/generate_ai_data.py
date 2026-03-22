@@ -6,11 +6,26 @@ This script runs the complete VarLend risk assessment pipeline:
 - Layer 2: Life simulation (events, portfolio evolution, macro shocks)
 
 Output: trajectory + result objects needed for AI Layer visualization
+
+Configuration:
+- n_trajectories=1: Deterministic (all paths use same life story) - legacy behavior
+- n_trajectories=100: Probabilistic (realistic event distribution) - RECOMMENDED
 """
 
 from run_life_simulation import run_full_life_simulation
 from monte_carlo_sim.src.integration.profile_builder import CustomerApplication
 from monte_carlo_sim.src.types import LoanConfig
+
+# CONFIGURATION: Set number of independent life trajectories
+# - 1 = deterministic (test single scenario)
+# - 100 = probabilistic (realistic risk distribution)
+#
+# NOTE: With N_TRAJECTORIES=100, the system generates 100 independent
+# life stories (each with different events/shocks) and aggregates the
+# results. This produces realistic probability distributions instead of
+# a single deterministic outcome.
+N_TRAJECTORIES = 100
+N_PATHS = 5000
 
 # Example customer application
 customer = CustomerApplication(
@@ -36,7 +51,10 @@ loan = LoanConfig(amount=5000, term_months=24, annual_rate=0.12)
 
 print("Running full life simulation (Layer 1 + Layer 2)...")
 print("Archetype: volatile_vic")
-print("Monte Carlo paths: 5000")
+print(f"Mode: {'PROBABILISTIC' if N_TRAJECTORIES > 1 else 'DETERMINISTIC'}")
+print(f"Trajectories: {N_TRAJECTORIES}")
+print(f"Paths per trajectory: {N_PATHS // N_TRAJECTORIES if N_TRAJECTORIES > 1 else N_PATHS}")
+print(f"Total Monte Carlo paths: {N_PATHS}")
 print("Horizon: 24 months\n")
 
 # THIS IS THE KEY FUNCTION - runs entire pipeline
@@ -44,8 +62,9 @@ trajectory, result = run_full_life_simulation(
     archetype_id='volatile_vic',
     customer_application=customer,
     loan_config=loan,
-    random_seed=42,
-    n_paths=5000
+    random_seed=None,  # Use None for true randomness across trajectories
+    n_paths=N_PATHS,
+    n_trajectories=N_TRAJECTORIES
 )
 
 print("="*60)

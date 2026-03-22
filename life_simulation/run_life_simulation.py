@@ -17,6 +17,7 @@ sys.path.insert(0, monte_carlo_dir)
 
 from life_simulation.types import LifeTrajectory
 from life_simulation.trajectory_builder import build_life_trajectory
+from life_simulation.aggregate_results import aggregate_simulation_results
 from data_pipeline.loaders import DataLoader
 
 # Import Monte Carlo components
@@ -42,17 +43,20 @@ def run_full_life_simulation(
     random_seed: Optional[int] = None,
     narrative_mode: bool = False,
     n_paths: int = 5000,
-    horizon_months: int = 24
+    horizon_months: int = 24,
+    n_trajectories: int = 100
 ) -> tuple[LifeTrajectory, SimulationResult]:
     """
-    Complete Layer 1 + Layer 2 integration.
+    Complete Layer 1 + Layer 2 integration with probabilistic event sampling.
     
     Process:
-    1. Build life trajectory (24 months of events, portfolio evolution, macro shocks)
-    2. Extract AIScenario from trajectory
-    3. Build WorkerProfile from customer application
-    4. Run Monte Carlo with AIScenario
-    5. Return both trajectory (for visualization) and results (for loan decision)
+    1. Generate N independent life trajectories (each with different events/shocks)
+    2. Run Monte Carlo simulation for each trajectory with M paths
+    3. Aggregate all N×M results to get realistic risk distribution
+    4. Return representative trajectory + aggregated results
+    
+    Key insight: n_trajectories=100 × paths_per_trajectory=50 = 5000 total paths,
+    but now with event diversity across trajectories.
     
     Args:
         archetype_id: Archetype ID from archetypes.json
@@ -60,38 +64,86 @@ def run_full_life_simulation(
         loan_config: Loan parameters
         random_seed: Optional seed for reproducibility
         narrative_mode: If True, uses deterministic events
-        n_paths: Number of Monte Carlo paths (default 5000)
+        n_paths: Total number of Monte Carlo paths (default 5000)
         horizon_months: Simulation horizon (default 24)
+        n_trajectories: Number of independent life trajectories to generate (default 100)
+            - Set to 1 for deterministic behavior (all paths use same trajectory)
+            - Set to 100+ for realistic probabilistic risk distributions
     
     Returns:
         (LifeTrajectory, SimulationResult)
-        - Trajectory shows what happened month-by-month
-        - Result shows final risk metrics and loan recommendation
+        - Trajectory: Representative sample life story (first trajectory)
+        - Result: Aggregated risk metrics across all trajectories
     """
-    trajectory = build_life_trajectory(
-        archetype_id,
-        n_months=horizon_months,
-        random_seed=random_seed,
-        narrative_mode=narrative_mode
-    )
-    
-    ai_scenario = trajectory.ai_scenario
-    
+    # Build worker profile once (doesn't change across trajectories)
     loader = DataLoader()
     profile = build_profile_from_application(customer_application, loader)
-    
-    config = SimulationConfig(
-        n_paths=n_paths,
+    load = load_and_prepare(profile, SimulationConfig(
+        n_paths=1,  # Dummy config just to get load params
         horizon_months=horizon_months,
-        random_seed=random_seed,
-        correlation_mode=CorrelationMode.CORRELATED
+        random_seed=random_seed
+    ))
+    
+    # Handle single trajectory case (legacy behavior)
+    if n_trajectories == 1:
+        trajectory = build_life_trajectory(
+            archetype_id,
+            n_months=horizon_months,
+            random_seed=random_seed,
+            narrative_mode=narrative_mode
+        )
+        
+        config = SimulationConfig(
+            n_paths=n_paths,
+            horizon_months=horizon_months,
+            random_seed=random_seed,
+            correlation_mode=CorrelationMode.CORRELATED
+        )
+        
+        result = run_simulation(profile, config, loan_config, load, trajectory.ai_scenario)
+        return trajectory, result
+    
+    # Generate multiple trajectories and aggregate
+    paths_per_trajectory = max(1, n_paths // n_trajectories)
+    trajectories = []
+    results = []
+    
+    for i in range(n_trajectories):
+        # Generate unique seed for this trajectory
+        traj_seed = (random_seed + i) if random_seed is not None else None
+        
+        # Generate life trajectory with unique events/shocks
+        trajectory = build_life_trajectory(
+            archetype_id,
+            n_months=horizon_months,
+            random_seed=traj_seed,
+            narrative_mode=narrative_mode
+        )
+        trajectories.append(trajectory)
+        
+        # Run Monte Carlo with this trajectory's scenario
+        config = SimulationConfig(
+            n_paths=paths_per_trajectory,
+            horizon_months=horizon_months,
+            random_seed=traj_seed,
+            correlation_mode=CorrelationMode.CORRELATED
+        )
+        
+        result = run_simulation(profile, config, loan_config, load, trajectory.ai_scenario)
+        results.append(result)
+    
+    # Aggregate all results into unified risk metrics
+    # Use first trajectory's scenario for expense calculation (approximation)
+    aggregated_result = aggregate_simulation_results(
+        results, 
+        loan_config, 
+        profile, 
+        load,
+        trajectories[0].ai_scenario
     )
     
-    load = load_and_prepare(profile, config)
-    
-    result = run_simulation(profile, config, loan_config, load, ai_scenario)
-    
-    return trajectory, result
+    # Return first trajectory as representative sample for visualization
+    return trajectories[0], aggregated_result
 
 
 def run_static_simulation(
@@ -137,7 +189,8 @@ def compare_static_vs_dynamic(
     archetype_id: str,
     customer_application: CustomerApplication,
     loan_config: LoanConfig,
-    random_seed: Optional[int] = None
+    random_seed: Optional[int] = None,
+    n_trajectories: int = 100
 ) -> dict:
     """
     Compare static (Layer 1 only) vs dynamic (Layer 1 + Layer 2) simulations.
@@ -147,6 +200,7 @@ def compare_static_vs_dynamic(
         customer_application: Customer data
         loan_config: Loan parameters
         random_seed: Optional seed
+        n_trajectories: Number of trajectories for dynamic simulation (default 100)
     
     Returns:
         Dictionary with comparison metrics
@@ -161,7 +215,8 @@ def compare_static_vs_dynamic(
         archetype_id,
         customer_application,
         loan_config,
-        random_seed=random_seed
+        random_seed=random_seed,
+        n_trajectories=n_trajectories
     )
     
     comparison = {
