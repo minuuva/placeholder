@@ -180,6 +180,7 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
       lines.push(`- ${cleanBullet(s)}`);
     });
     lines.push("");
+    lines.push("");
   }
 
   // --- Default Analysis ---
@@ -189,6 +190,7 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
     parsed.defaultAnalysis.forEach(s => {
       lines.push(`- ${cleanBullet(s)}`);
     });
+    lines.push("");
     lines.push("");
   }
 
@@ -200,6 +202,7 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
       lines.push(`- ${cleanBullet(s)}`);
     });
     lines.push("");
+    lines.push("");
   }
 
   // --- Life Events ---
@@ -209,6 +212,7 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
     parsed.lifeEvents.forEach(s => {
       lines.push(`- ${cleanBullet(s)}`);
     });
+    lines.push("");
     lines.push("");
   }
 
@@ -220,6 +224,7 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
       lines.push(`- ${cleanBullet(s)}`);
     });
     lines.push("");
+    lines.push("");
   }
 
   // --- Positive Factors ---
@@ -230,6 +235,7 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
       lines.push(`- ${cleanBullet(s)}`);
     });
     lines.push("");
+    lines.push("");
   }
 
   // --- Financial Resilience ---
@@ -239,6 +245,7 @@ function formatAiSimulationForMessage(data: AiLayerSimulateResponse, ok: boolean
     parsed.resilience.forEach(s => {
       lines.push(`- ${cleanBullet(s)}`);
     });
+    lines.push("");
     lines.push("");
   }
 
@@ -1387,23 +1394,27 @@ Results will appear below in just a moment...`,
                           </div>
                         ) : (
                           <>
-                            <div className="prose prose-invert prose-sm max-w-none
+                            <div className="prose prose-invert prose-sm max-w-none text-[13px]
                               prose-headings:text-white prose-headings:font-display prose-headings:font-semibold
-                              prose-h2:text-xl prose-h2:mb-4 prose-h2:mt-0
-                              prose-h3:text-base prose-h3:mb-4 prose-h3:mt-8 prose-h3:text-amber-400
-                              prose-p:text-white/80 prose-p:leading-7 prose-p:my-4
+                              prose-h2:text-lg prose-h2:mb-3 prose-h2:mt-0
+                              prose-h3:text-sm prose-h3:mb-3 prose-h3:mt-6 prose-h3:text-amber-400
+                              prose-p:text-white/80 prose-p:leading-6 prose-p:my-3 prose-p:text-[13px]
                               prose-strong:text-white prose-strong:font-semibold
-                              prose-code:text-amber-400 prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-                              prose-table:text-sm prose-th:text-white/60 prose-th:font-medium prose-th:py-2
-                              prose-td:py-2 prose-td:text-white/80
-                              prose-ul:my-4 prose-li:text-white/80 prose-li:my-1
-                              prose-hr:my-8 prose-hr:border-white/20">
+                              prose-code:text-amber-400 prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs
+                              prose-table:text-xs prose-th:text-white/60 prose-th:font-medium prose-th:py-1.5
+                              prose-td:py-1.5 prose-td:text-white/80 prose-td:text-xs
+                              prose-ul:my-3 prose-li:text-white/80 prose-li:my-0.5 prose-li:text-[13px]
+                              prose-hr:my-6 prose-hr:border-white/20">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                             </div>
 
                             {message.aiSimulation?.charts && message.aiSimulation.charts.length > 0 && (
                               <div className="mt-6 space-y-6">
-                                {message.aiSimulation.charts.map((c) => (
+                                {message.aiSimulation.charts
+                                  .filter((c) => !c.type?.toLowerCase().includes('parameter_evolution') &&
+                                                 !c.description?.toLowerCase().includes('parameter evolution') &&
+                                                 !c.description?.toLowerCase().includes('income parameters'))
+                                  .map((c) => (
                                   <div
                                     key={`${message.id}-${c.type}-${c.path}`}
                                     className="rounded-xl overflow-hidden border border-white/[0.1] bg-black/30"
