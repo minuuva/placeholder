@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic();
+// Explicitly pass API key to ensure it's used
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 // All required parameters for a complete simulation (11 total — no credit score)
 const REQUIRED_PARAMS = {
@@ -175,7 +178,11 @@ export interface ExtractionResponse {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    console.log("[extract-params] API key configured:", !!apiKey, "length:", apiKey?.length || 0);
+
+    if (!apiKey) {
+      console.error("[extract-params] ANTHROPIC_API_KEY not found in environment");
       return NextResponse.json(
         {
           error: "API key not configured",
@@ -208,6 +215,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log("[extract-params] Calling Anthropic API with message:", message.substring(0, 100));
+
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
@@ -223,6 +232,8 @@ Return valid JSON only. Only extract NEW information - don't re-extract params a
         },
       ],
     });
+
+    console.log("[extract-params] Anthropic API response received, content blocks:", response.content.length);
 
     const textContent = response.content.find((c) => c.type === "text");
     if (!textContent || textContent.type !== "text") {
@@ -275,14 +286,19 @@ Return valid JSON only. Only extract NEW information - don't re-extract params a
 
     return NextResponse.json(extraction);
   } catch (error) {
-    console.error("Parameter extraction error:", error);
+    console.error("[extract-params] Parameter extraction error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isAuthError = errorMessage.includes("401") || errorMessage.includes("authentication") || errorMessage.includes("API key");
+
     return NextResponse.json(
       {
-        error: "Failed to extract parameters",
-        details: String(error),
+        error: isAuthError ? "API authentication failed" : "Failed to extract parameters",
+        details: errorMessage,
+        extractedParams: {},
+        missingParams: Object.keys(REQUIRED_PARAMS),
         parameterDefinitions: REQUIRED_PARAMS,
       },
-      { status: 500 }
+      { status: isAuthError ? 401 : 500 }
     );
   }
 }

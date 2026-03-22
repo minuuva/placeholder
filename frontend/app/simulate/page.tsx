@@ -792,13 +792,22 @@ Next: use the input below to describe optional macro or life events and layer st
 
       const extraction = await extractResponse.json();
 
-      if (extraction.error && !extraction.extractedParams) {
+      // Check for errors - extractedParams: {} is truthy but empty, so check Object.keys
+      const hasExtractedData = extraction.extractedParams &&
+        Object.keys(extraction.extractedParams).some(
+          (k) => extraction.extractedParams[k] !== null && extraction.extractedParams[k] !== undefined
+        );
+
+      if (extraction.error && !hasExtractedData) {
+        console.error("Extract params API error:", extraction.error, extraction.details);
         setMessages((prev) =>
           prev.map((m) =>
             m.id === loadingMessageId
               ? {
                   ...m,
-                  content: "I need more details about the applicant. Please provide their gig work information, income details, or loan request.",
+                  content: extraction.error === "API key not configured"
+                    ? "**Configuration Error:** Anthropic API key is not configured. Please set ANTHROPIC_API_KEY in .env.local"
+                    : "I need more details about the applicant. Please provide their gig work information, income details, or loan request.",
                   isLoading: false,
                 }
               : m
