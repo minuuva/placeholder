@@ -9,7 +9,6 @@ import {
   PreviewSection,
   ManifestoSection,
   PartnersSection,
-  AISection,
   Footer,
 } from "@/components/sections";
 
@@ -28,10 +27,7 @@ export default function Home() {
       {/* Section 3: Manifesto - monopo style text reveal */}
       <ManifestoSection />
 
-      {/* Section 4: AI Scenario Analysis */}
-      <AISection />
-
-      {/* Section 5: Live Preview */}
+      {/* Section 4: Live Preview */}
       <PreviewSection />
 
       {/* Section 6: Partners & Data Sources */}
